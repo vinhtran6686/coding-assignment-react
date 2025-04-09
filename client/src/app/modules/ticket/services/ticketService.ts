@@ -1,119 +1,81 @@
 import axios from 'axios';
+import { 
+  Ticket, 
+  CreateTicketRequest, 
+  UpdateTicketRequest, 
+  TicketFilters 
+} from '../types';
+import { API_URL } from '../../../constants';
 
-export interface Ticket {
-  id: number;
-  title: string;
-  description: string;
-  status: 'open' | 'in_progress' | 'resolved' | 'closed';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  created_at: string;
-  updated_at: string;
-  assigned_to?: string;
-  created_by: string;
-}
-
-const API_URL = 'api/tickets';
-
-// Mock data - sẽ được thay thế bằng API calls khi có backend
-const mockTickets: Ticket[] = [
-  {
-    id: 1,
-    title: 'Error when uploading files',
-    description: 'Users cannot upload files larger than 2MB',
-    status: 'open',
-    priority: 'high',
-    created_at: '2023-04-01T10:30:00',
-    updated_at: '2023-04-01T10:30:00',
-    created_by: 'john.doe@example.com',
-    assigned_to: 'support@example.com'
-  },
-  {
-    id: 2,
-    title: 'Login issue on mobile devices',
-    description: 'Users on Android devices cannot login to the application',
-    status: 'in_progress',
-    priority: 'urgent',
-    created_at: '2023-04-02T14:20:00',
-    updated_at: '2023-04-03T09:15:00',
-    created_by: 'jane.smith@example.com',
-    assigned_to: 'tech@example.com'
-  },
-  {
-    id: 3,
-    title: 'Dashboard displays incorrect data',
-    description: 'Sales metrics on the dashboard do not match the reports',
-    status: 'open',
-    priority: 'medium',
-    created_at: '2023-04-03T16:45:00',
-    updated_at: '2023-04-03T16:45:00',
-    created_by: 'manager@example.com'
+/**
+ * Get all tickets with optional filtering
+ */
+export const getTickets = async (filters?: TicketFilters): Promise<Ticket[]> => {
+  try {
+    const params = new URLSearchParams();
+    
+    if (filters) {
+      if (filters.status) params.append('status', filters.status);
+      if (filters.priority) params.append('priority', filters.priority);
+      if (filters.searchQuery) params.append('q', filters.searchQuery);
+      if (filters.assignedTo) params.append('assignedTo', filters.assignedTo.toString());
+    }
+    
+    const response = await axios.get(API_URL.TICKETS, { params });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching tickets:', error);
+    throw error;
   }
-];
-
-// Giả lập API calls với dữ liệu mock
-export const getTickets = async (): Promise<Ticket[]> => {
-  // Giả lập API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(mockTickets);
-    }, 500);
-  });
 };
 
-export const getTicketById = async (id: number): Promise<Ticket | undefined> => {
-  // Giả lập API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const ticket = mockTickets.find(t => t.id === id);
-      resolve(ticket);
-    }, 300);
-  });
+/**
+ * Get a single ticket by ID
+ */
+export const getTicket = async (id: number): Promise<Ticket> => {
+  try {
+    const response = await axios.get(API_URL.TICKET_DETAIL(id));
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching ticket with ID ${id}:`, error);
+    throw error;
+  }
 };
 
-export const createTicket = async (ticketData: Omit<Ticket, 'id' | 'created_at' | 'updated_at'>): Promise<Ticket> => {
-  // Giả lập API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const newTicket: Ticket = {
-        ...ticketData,
-        id: mockTickets.length + 1,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      resolve(newTicket);
-    }, 700);
-  });
+/**
+ * Create a new ticket
+ */
+export const createTicket = async (ticket: CreateTicketRequest): Promise<Ticket> => {
+  try {
+    const response = await axios.post(API_URL.TICKET_CREATE, ticket);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating ticket:', error);
+    throw error;
+  }
 };
 
-export const updateTicket = async (id: number, ticketData: Partial<Ticket>): Promise<Ticket | undefined> => {
-  // Giả lập API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const ticketIndex = mockTickets.findIndex(t => t.id === id);
-      if (ticketIndex !== -1) {
-        const updatedTicket: Ticket = {
-          ...mockTickets[ticketIndex],
-          ...ticketData,
-          updated_at: new Date().toISOString()
-        };
-        resolve(updatedTicket);
-      } else {
-        resolve(undefined);
-      }
-    }, 500);
-  });
+/**
+ * Update an existing ticket
+ */
+export const updateTicket = async (id: number, updateData: UpdateTicketRequest): Promise<Ticket> => {
+  try {
+    const response = await axios.put(API_URL.TICKET_UPDATE(id), updateData);
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating ticket with ID ${id}:`, error);
+    throw error;
+  }
 };
 
-export const deleteTicket = async (id: number): Promise<boolean> => {
-  // Giả lập API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const ticketIndex = mockTickets.findIndex(t => t.id === id);
-      if (ticketIndex !== -1) {
-        resolve(true);
-      } else {
-        resolve(false);
-      }
-    }, 400);
-  });
+/**
+ * Delete a ticket
+ */
+export const deleteTicket = async (id: number): Promise<void> => {
+  try {
+    await axios.delete(API_URL.TICKET_DELETE(id));
+  } catch (error) {
+    console.error(`Error deleting ticket with ID ${id}:`, error);
+    throw error;
+  }
 }; 

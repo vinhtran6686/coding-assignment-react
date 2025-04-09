@@ -3,7 +3,6 @@ import { FC, createContext, useContext, useState, useEffect } from 'react';
 // Define layout config types
 export interface LayoutConfig {
   darkMode: boolean;
-  sidebarOpen: boolean;
   headerFixed: boolean;
   contentWidth: 'fluid' | 'fixed';
   illustrations?: {
@@ -14,7 +13,6 @@ export interface LayoutConfig {
 // Default layout configuration
 const defaultLayoutConfig: LayoutConfig = {
   darkMode: false,
-  sidebarOpen: true,
   headerFixed: true,
   contentWidth: 'fluid',
   illustrations: {
@@ -26,11 +24,9 @@ const defaultLayoutConfig: LayoutConfig = {
 const LayoutContext = createContext<{
   config: LayoutConfig;
   setConfig: (config: LayoutConfig) => void;
-  toggleSidebar: () => void;
 }>({
   config: defaultLayoutConfig,
   setConfig: () => { },
-  toggleSidebar: () => { },
 });
 
 // Layout Provider props interface
@@ -42,15 +38,8 @@ interface LayoutProviderProps {
 export const LayoutProvider: FC<LayoutProviderProps> = ({ children }) => {
   const [config, setConfig] = useState<LayoutConfig>(defaultLayoutConfig);
 
-  const toggleSidebar = () => {
-    setConfig({
-      ...config,
-      sidebarOpen: !config.sidebarOpen,
-    });
-  }; 
-
   return (
-    <LayoutContext.Provider value={{ config, setConfig, toggleSidebar }}>
+    <LayoutContext.Provider value={{ config, setConfig }}>
       {children}
     </LayoutContext.Provider>
   );

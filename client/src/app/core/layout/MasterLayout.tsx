@@ -6,33 +6,28 @@ import Header from './components/header/Header';
 import Sidebar from './components/sidebar/Sidebar';
 import { useLayout } from './core/LayoutProvider';
 
+const SIDEBAR_WIDTH = 240;
+
 const MainWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
-  flexDirection: 'column',
   minHeight: '100vh',
+  backgroundColor: theme.palette.mode === 'light'
+    ? '#f5f8fa'
+    : theme.palette.background.default,
 }));
 
-// Define interface for ContentWrapper props
-interface ContentWrapperProps {
-  sidebarOpen: boolean;
-}
-
-// Use shouldForwardProp to prevent the custom prop from being passed to the DOM
-const ContentWrapper = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'sidebarOpen'
-})<ContentWrapperProps>(({ theme, sidebarOpen }) => ({
+const ContentWrapper = styled(Box)(({ theme }) => ({
+  flexGrow: 1,
   display: 'flex',
-  flex: '1 1 auto',
-  marginLeft: sidebarOpen ? 240 : 0,
-  transition: theme.transitions.create('margin-left', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.enteringScreen,
-  }),
+  flexDirection: 'column',
+  width: `calc(100% - ${SIDEBAR_WIDTH}px)`,
+  marginLeft: SIDEBAR_WIDTH,
 }));
 
 const PageWrapper = styled(Box)(({ theme }) => ({
   flexGrow: 1,
   padding: theme.spacing(3),
+  overflow: 'auto',
 }));
 
 const MasterLayout: FC = () => {
@@ -40,9 +35,9 @@ const MasterLayout: FC = () => {
 
   return (
     <MainWrapper>
-      <Header />
-      <Sidebar open={config.sidebarOpen} />
-      <ContentWrapper sidebarOpen={config.sidebarOpen}>
+      <Sidebar />
+      <ContentWrapper>
+        <Header />
         <PageWrapper>
           <Outlet />
         </PageWrapper>

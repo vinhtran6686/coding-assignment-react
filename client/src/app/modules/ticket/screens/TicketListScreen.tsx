@@ -43,19 +43,22 @@ const TicketListScreen: React.FC = () => {
 
   return (
     <Container maxWidth="lg">
-      <Paper sx={{ p: 3, mb: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Box>
-            <Typography variant="h4" component="h1" gutterBottom>
-              Tickets
-            </Typography>
-            <Breadcrumbs aria-label="breadcrumb">
-              <MuiLink component={Link} to="/dashboard" underline="hover" color="inherit">
-                Dashboard
-              </MuiLink>
-              <Typography color="text.primary">Tickets</Typography>
-            </Breadcrumbs>
-          </Box>
+      {/* Title Section */}
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          Tickets
+        </Typography>
+        <Breadcrumbs aria-label="breadcrumb">
+          <MuiLink component={Link} to="/dashboard" underline="hover" color="inherit">
+            Dashboard
+          </MuiLink>
+          <Typography color="text.primary">Tickets</Typography>
+        </Breadcrumbs>
+      </Box>
+      
+      {/* Content Section */}
+      <Paper sx={{ p: 3, mb: 4, borderRadius: 2, boxShadow: (theme) => theme.shadows[2] }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
           <Button
             variant="contained"
             color="primary"

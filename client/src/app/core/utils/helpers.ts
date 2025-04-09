@@ -52,8 +52,8 @@ export function checkIsActive(pathname: string, url: string) {
 }
 
 // React18MigrationHelpers
-export type WithChildren = {
-  children?: ReactNode
+export interface WithChildren {
+  children: ReactNode;
 }
 
 // CSS Utils
@@ -63,4 +63,49 @@ export function getCSSVariableValue(variableName: string): string {
     hex = hex.trim()
   }
   return hex
+}
+
+/**
+ * Format a number with commas
+ */
+export function formatNumber(num: number): string {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+/**
+ * Capitalize the first letter of a string
+ */
+export function capitalizeFirstLetter(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+/**
+ * Convert a string to camelCase
+ */
+export function toCamelCase(str: string): string {
+  return str
+    .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => {
+      return index === 0 ? word.toLowerCase() : word.toUpperCase();
+    })
+    .replace(/\s+/g, '');
+}
+
+/**
+ * Create a debounced function that delays invoking func until after wait milliseconds
+ */
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  
+  return function(...args: Parameters<T>) {
+    const later = () => {
+      timeout = null;
+      func(...args);
+    };
+    
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
 } 

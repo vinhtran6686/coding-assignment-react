@@ -6,19 +6,6 @@ import { Outlet } from 'react-router-dom'
 import Box from '@mui/material/Box'
 
 const AuthLayout = () => {
-
-    useEffect(() => {
-        const root = document.getElementById('root')
-        if (root) {
-            root.style.height = '100%'
-        }
-        return () => {
-            if (root) {
-                root.style.height = 'auto'
-            }
-        }
-    }, [])
-
     return (
         <Box
             sx={{

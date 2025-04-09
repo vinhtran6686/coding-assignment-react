@@ -1,16 +1,21 @@
-// Components
-export { default as TicketList } from './components/TicketList';
-export { default as TicketDetail } from './components/TicketDetail';
+// Export main components
+export { default as TicketPage } from './TicketPage';
 
-// Screens
+// Export screens
 export { default as TicketListScreen } from './screens/TicketListScreen';
 export { default as TicketDetailScreen } from './screens/TicketDetailScreen';
 
-// Hooks
+// Export hooks
 export { useTickets } from './hooks/useTickets';
+export { useTicket } from './hooks/useTicket';
+
+// Export types
+export type { Ticket } from './types';
+
+// Re-export components
+export { default as TicketList } from './components/TicketList';
+export { default as TicketForm } from './components/TicketForm';
+export { default as TicketCard } from './components/TicketCard';
 
 // Services
-export * from './services/ticketService';
-
-// Main module entry point
-export { default } from './TicketPage'; 
+export * from './services/ticketService'; 
