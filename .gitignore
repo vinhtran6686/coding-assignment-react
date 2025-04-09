@@ -1,5 +1,5 @@
-node_modules  
-dist
-.nxcache
-yarn.lock
+node_modules   
+.nxcache 
 package-lock.json
+yarn.lock
+dist

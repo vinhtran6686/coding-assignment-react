@@ -1,13 +1,14 @@
 import { lazy, FC, Suspense } from 'react'
 import { Route, Routes, Navigate } from 'react-router-dom'
-import MasterLayout from '../../mui-theme/layout/MasterLayout'
+import MasterLayout from '../core/layout/MasterLayout'
 import TopBarProgress from 'react-topbar-progress-indicator'
-import { getCSSVariableValue } from '../../mui-theme/assets/ts/_utils'
-import { WithChildren } from '../../mui-theme/helpers'
-import DashboardPage from '../pages/dashboard/DashboardPage'
+import { getCSSVariableValue, WithChildren } from '../core/utils/helpers'
+import DashboardPageBridge from '../pages/dashboard/DashboardPage'
+import TicketsPage from '../pages/tickets/TicketsPage'
 
 const PrivateRoutes = () => {
-    const TicketPage = lazy(() => import('../modules/ticket/TicketPage'))
+    // Lazy loading không còn cần thiết vì chúng ta đã cập nhật cấu trúc
+    // Ticket module được import qua TicketsPage
 
     return (
         <Routes>
@@ -15,16 +16,9 @@ const PrivateRoutes = () => {
                 {/* Redirect to Dashboard after success login/registartion */}
                 <Route path='auth/*' element={<Navigate to='/dashboard' />} />
                 {/* Pages */}
-                <Route path='dashboard' element={<DashboardPage />} />
-                {/* Lazy Modules */}
-                <Route
-                    path='crafted/pages/ticket/*'
-                    element={
-                        <SuspensedView>
-                            <TicketPage />
-                        </SuspensedView>
-                    }
-                />
+                <Route path='dashboard' element={<DashboardPageBridge />} />
+                {/* Tickets page sử dụng component đã tạo */}
+                <Route path='crafted/pages/ticket/*' element={<TicketsPage />} />
                 {/* Page Not Found */}
                 <Route path='*' element={<Navigate to='/error/404' />} />
             </Route>

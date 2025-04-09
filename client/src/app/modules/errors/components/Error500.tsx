@@ -1,6 +1,6 @@
+import { toAbsoluteUrl } from 'client/src/app/core/utils/helpers'
 import { FC } from 'react'
-import { Link } from 'react-router-dom'
-import { toAbsoluteUrl } from '../../../../mui-theme/helpers'
+import { Link } from 'react-router-dom' 
 
 const Error500: FC = () => {
   return (

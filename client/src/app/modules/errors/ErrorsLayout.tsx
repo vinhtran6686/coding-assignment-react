@@ -1,7 +1,7 @@
 import {useEffect} from 'react'
-import {Outlet} from 'react-router-dom'
-import {useThemeMode} from '../../../mui-theme/partials'
-import {toAbsoluteUrl} from '../../../mui-theme/helpers'
+import {Outlet} from 'react-router-dom' 
+import { useThemeMode } from '../../core/theme/components'
+import { toAbsoluteUrl } from '../../core/utils'
 
 const BODY_CLASSES = ['bgi-size-cover', 'bgi-position-center', 'bgi-no-repeat']
 const ErrorsLayout = () => {

@@ -3,8 +3,7 @@ import * as Yup from 'yup'
 import { Link } from 'react-router-dom'
 import { useFormik } from 'formik'
 import { getUserByToken, login } from '../core/_requests'
-import { useAuth } from '../core/Auth'
-import { toAbsoluteUrl } from 'client/src/mui-theme/helpers'
+import { useAuth } from '../core/Auth' 
 
 // MUI imports
 import Box from '@mui/material/Box'

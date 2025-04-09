@@ -1,15 +1,11 @@
-import { toAbsoluteUrl } from 'client/src/mui-theme/helpers'
+import { toAbsoluteUrl } from 'client/src/app/core/utils/helpers'
 import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 
 // MUI imports
 import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import { useTheme } from '@mui/material/styles'
 
 const AuthLayout = () => {
-    const theme = useTheme()
 
     useEffect(() => {
         const root = document.getElementById('root')

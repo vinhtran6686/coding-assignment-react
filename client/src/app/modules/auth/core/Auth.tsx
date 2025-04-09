@@ -1,10 +1,10 @@
 /* eslint-disable react-refresh/only-export-components */
 import { FC, useState, useEffect, createContext, useContext, Dispatch, SetStateAction } from 'react'
-import { LayoutSplashScreen } from '../../../../mui-theme/layout/core'
+import { LayoutSplashScreen } from 'client/src/app/core/layout/core'
 import { AuthModel, UserModel } from './_models'
 import * as authHelper from './AuthHelpers'
-import { getUserByToken } from './_requests'
-import { WithChildren } from '../../../../mui-theme/helpers'
+import { getUserByToken } from './_requests' 
+import { WithChildren } from 'client/src/app/core/utils'
 
 type AuthContextProps = {
   auth: AuthModel | undefined
