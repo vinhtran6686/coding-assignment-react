@@ -7,14 +7,26 @@
     "test": "nx run-many --target=test --projects=server,client"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.0",
+    "@mui/lab": "^5.0.0-alpha.153",
+    "@mui/material": "^5.14.0",
+    "@mui/x-data-grid": "^6.18.4",
     "@nestjs/common": "9.2.1",
     "@nestjs/core": "9.2.1",
     "@nestjs/platform-express": "9.2.1",
+    "@tanstack/react-query": "^4.29.19",
+    "@tanstack/react-query-devtools": "^4.29.19",
+    "axios": "^1.4.0",
+    "formik": "^2.4.6",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-router": "^6.3.0",
     "react-router-dom": "6.4.3",
-    "tslib": "^2.3.0"
+    "react-topbar-progress-indicator": "^4.1.1",
+    "tslib": "^2.3.0",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.14.5",
