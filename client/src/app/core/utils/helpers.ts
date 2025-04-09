@@ -1,5 +1,7 @@
 import { ReactNode } from 'react'
-import { BASE_URL } from "client/src/app/contains";
+
+// API configuration
+export const BASE_URL = 'http://localhost:4200/api';
 
 // AssetHelpers
 export const toAbsoluteUrl = (pathname: string) =>

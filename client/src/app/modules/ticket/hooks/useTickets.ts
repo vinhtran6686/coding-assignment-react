@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Ticket, getTickets, getTicketById, createTicket, updateTicket, deleteTicket } from '../services/ticketService';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getTickets, getTicket, createTicket, updateTicket, deleteTicket } from '../services/ticketService';
+import { Ticket, CreateTicketRequest, UpdateTicketRequest } from '../types';
 
 export const useTickets = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const fetchTickets = async () => {
     setLoading(true);
@@ -30,7 +33,7 @@ export const useTickets = () => {
     setError(null);
     
     try {
-      return await getTicketById(id);
+      return await getTicket(id);
     } catch (err) {
       setError(`Failed to fetch ticket with ID ${id}`);
       console.error(err);
@@ -40,7 +43,7 @@ export const useTickets = () => {
     }
   };
 
-  const addTicket = async (ticketData: Omit<Ticket, 'id' | 'created_at' | 'updated_at'>) => {
+  const addTicket = async (ticketData: CreateTicketRequest) => {
     setLoading(true);
     setError(null);
     
@@ -57,18 +60,16 @@ export const useTickets = () => {
     }
   };
 
-  const editTicket = async (id: number, ticketData: Partial<Ticket>) => {
+  const editTicket = async (id: number, ticketData: UpdateTicketRequest) => {
     setLoading(true);
     setError(null);
     
     try {
       const updatedTicket = await updateTicket(id, ticketData);
       
-      if (updatedTicket) {
-        setTickets(tickets.map(ticket => 
-          ticket.id === id ? updatedTicket : ticket
-        ));
-      }
+      setTickets(tickets.map(ticket => 
+        ticket.id === id ? updatedTicket : ticket
+      ));
       
       return updatedTicket;
     } catch (err) {
@@ -85,13 +86,9 @@ export const useTickets = () => {
     setError(null);
     
     try {
-      const success = await deleteTicket(id);
-      
-      if (success) {
-        setTickets(tickets.filter(ticket => ticket.id !== id));
-      }
-      
-      return success;
+      await deleteTicket(id);
+      setTickets(tickets.filter(ticket => ticket.id !== id));
+      return true;
     } catch (err) {
       setError(`Failed to delete ticket with ID ${id}`);
       console.error(err);

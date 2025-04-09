@@ -28,18 +28,21 @@ const TicketForm: React.FC<TicketFormProps> = ({
   isSubmitting = false,
   isEdit = false,
 }) => {
+  // Use different form types based on isEdit
+  type FormData = typeof isEdit extends true ? UpdateTicketRequest : CreateTicketRequest;
+  
   const {
     control,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<CreateTicketRequest | UpdateTicketRequest>({
+  } = useForm<FormData>({
     defaultValues: {
       title: ticket?.title || '',
       description: ticket?.description || '',
       priority: ticket?.priority || TicketPriority.MEDIUM,
-      ...(isEdit && { status: ticket?.status || TicketStatus.OPEN }),
-    },
+      ...(isEdit ? { status: ticket?.status || TicketStatus.OPEN } : {}),
+    } as FormData,
   });
 
   // Reset form when ticket changes
@@ -49,12 +52,12 @@ const TicketForm: React.FC<TicketFormProps> = ({
         title: ticket.title,
         description: ticket.description,
         priority: ticket.priority,
-        ...(isEdit && { status: ticket.status }),
-      });
+        ...(isEdit ? { status: ticket.status } : {}),
+      } as FormData);
     }
   }, [ticket, reset, isEdit]);
 
-  const handleFormSubmit = async (data: CreateTicketRequest | UpdateTicketRequest) => {
+  const handleFormSubmit = async (data: FormData) => {
     await onSubmit(data);
   };
 
@@ -133,11 +136,11 @@ const TicketForm: React.FC<TicketFormProps> = ({
           {isEdit && (
             <Grid item xs={12} md={6}>
               <Controller
-                name="status"
+                name={"status" as keyof FormData}
                 control={control}
                 rules={{ required: 'Status is required' }}
                 render={({ field }) => (
-                  <FormControl fullWidth error={!!errors.status}>
+                  <FormControl fullWidth error={!!errors["status" as keyof typeof errors]}>
                     <InputLabel>Status</InputLabel>
                     <Select
                       {...field}
@@ -149,8 +152,10 @@ const TicketForm: React.FC<TicketFormProps> = ({
                       <MenuItem value={TicketStatus.RESOLVED}>Resolved</MenuItem>
                       <MenuItem value={TicketStatus.CLOSED}>Closed</MenuItem>
                     </Select>
-                    {errors.status && (
-                      <FormHelperText>{errors.status.message}</FormHelperText>
+                    {errors["status" as keyof typeof errors] && (
+                      <FormHelperText>
+                        {(errors["status" as keyof typeof errors] as any)?.message}
+                      </FormHelperText>
                     )}
                   </FormControl>
                 )}

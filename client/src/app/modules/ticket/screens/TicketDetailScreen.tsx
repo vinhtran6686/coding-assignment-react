@@ -1,88 +1,156 @@
-import React, { useEffect, useState } from 'react';
-import { 
-  Container, 
-  Box, 
-  Button, 
-  Typography, 
-  Breadcrumbs, 
+import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Typography,
+  Container,
   Paper,
-  Link as MuiLink
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Breadcrumbs,
+  Link as MuiLink,
+  CircularProgress,
+  Alert
 } from '@mui/material';
-import { Link, useParams, useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Link } from 'react-router-dom';
 import TicketDetail from '../components/TicketDetail';
-import { useTickets } from '../hooks/useTickets';
-import { Ticket } from '../services/ticketService';
+import { useTicket } from '../hooks/useTicket';
 
 const TicketDetailScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { fetchTicket } = useTickets();
-  const [ticket, setTicket] = useState<Ticket | undefined>(undefined);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const ticketId = parseInt(id || '0', 10);
+  
+  const { 
+    ticket, 
+    isLoading, 
+    error, 
+    deleteTicket, 
+    isDeleting 
+  } = useTicket(ticketId);
+  
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  useEffect(() => {
-    const loadTicket = async () => {
-      if (!id) {
-        setError('Ticket ID is missing');
-        setLoading(false);
-        return;
-      }
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+  };
 
-      try {
-        const ticketId = parseInt(id, 10);
-        if (isNaN(ticketId)) {
-          setError('Invalid Ticket ID');
-          setLoading(false);
-          return;
-        }
+  const handleDeleteConfirm = async () => {
+    const success = await deleteTicket();
+    if (success) {
+      setDeleteDialogOpen(false);
+      navigate('/ticket');
+    }
+  };
 
-        const fetchedTicket = await fetchTicket(ticketId);
-        setTicket(fetchedTicket);
-      } catch (err) {
-        setError('Failed to load ticket details');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+  };
 
-    loadTicket();
-  }, [id, fetchTicket]);
+  if (isLoading) {
+    return (
+      <Container maxWidth="lg">
+        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+          <CircularProgress />
+        </Box>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container maxWidth="lg">
+        <Alert severity="error" sx={{ my: 2 }}>
+          {error instanceof Error ? error.message : 'Failed to load ticket'}
+        </Alert>
+        <Button
+          component={Link}
+          to="/ticket"
+          startIcon={<ArrowBackIcon />}
+          sx={{ mt: 2 }}
+        >
+          Back to Tickets
+        </Button>
+      </Container>
+    );
+  }
+
+  if (!ticket) {
+    return (
+      <Container maxWidth="lg">
+        <Alert severity="warning" sx={{ my: 2 }}>
+          Ticket not found
+        </Alert>
+        <Button
+          component={Link}
+          to="/ticket"
+          startIcon={<ArrowBackIcon />}
+          sx={{ mt: 2 }}
+        >
+          Back to Tickets
+        </Button>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="lg">
-      <Paper sx={{ p: 3, mb: 4 }}>
-        <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Box>
-              <Typography variant="h4" component="h1" gutterBottom>
-                Ticket Details
-              </Typography>
-              <Breadcrumbs aria-label="breadcrumb">
-                <MuiLink component={Link} to="/dashboard" underline="hover" color="inherit">
-                  Dashboard
-                </MuiLink>
-                <MuiLink component={Link} to="/crafted/pages/ticket" underline="hover" color="inherit">
-                  Tickets
-                </MuiLink>
-                <Typography color="text.primary">Details</Typography>
-              </Breadcrumbs>
-            </Box>
-            <Button
-              variant="outlined"
-              startIcon={<ArrowBackIcon />}
-              component={Link}
-              to="/crafted/pages/ticket"
-            >
-              Back to List
-            </Button>
-          </Box>
-        </Box>
-        
-        <TicketDetail ticket={ticket} loading={loading} error={error} />
+      {/* Title Section */}
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          Ticket Details
+        </Typography>
+        <Breadcrumbs aria-label="breadcrumb">
+          <MuiLink component={Link} to="/dashboard" underline="hover" color="inherit">
+            Dashboard
+          </MuiLink>
+          <MuiLink component={Link} to="/ticket" underline="hover" color="inherit">
+            Tickets
+          </MuiLink>
+          <Typography color="text.primary">Ticket #{ticket.id}</Typography>
+        </Breadcrumbs>
+      </Box>
+      
+      {/* Content Section */}
+      <Paper sx={{ p: 3, mb: 4, borderRadius: 2, boxShadow: (theme) => theme.shadows[2] }}>
+        <TicketDetail 
+          ticket={ticket} 
+          onDelete={handleDeleteClick}
+        />
       </Paper>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          Confirm Delete
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this ticket? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel}>Cancel</Button>
+          <Button 
+            onClick={handleDeleteConfirm} 
+            color="error" 
+            autoFocus
+            disabled={isDeleting}
+          >
+            {isDeleting ? 'Deleting...' : 'Delete'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

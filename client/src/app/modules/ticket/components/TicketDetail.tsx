@@ -1,182 +1,212 @@
 import React from 'react';
 import { 
-  Card, 
-  CardContent, 
+  Box, 
   Typography, 
-  Grid,
-  Chip,
+  Chip, 
+  Grid, 
+  Button, 
   Divider,
-  Box,
-  Avatar,
-  Button,
-  Stack,
-  CircularProgress,
-  Alert
+  Card,
+  CardContent,
+  Stack
 } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { Ticket } from '../services/ticketService';
+import { 
+  Edit as EditIcon, 
+  Delete as DeleteIcon,
+  PriorityHigh as HighIcon,
+  ErrorOutline as CriticalIcon,
+  ArrowDownward as LowIcon,
+  Remove as MediumIcon
+} from '@mui/icons-material';
+import { Ticket, TicketPriority, TicketStatus } from '../types';
 
 interface TicketDetailProps {
-  ticket: Ticket | undefined;
-  loading: boolean;
-  error: string | null;
+  ticket: Ticket;
+  onDelete: () => void;
 }
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'open':
-      return 'info';
-    case 'in_progress':
-      return 'warning';
-    case 'resolved':
-      return 'success';
-    case 'closed':
-      return 'default';
-    default:
-      return 'default';
-  }
-};
+const TicketDetail: React.FC<TicketDetailProps> = ({ ticket, onDelete }) => {
+  // Format dates
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
 
-const getPriorityColor = (priority: string) => {
-  switch (priority) {
-    case 'urgent':
-      return 'error';
-    case 'high':
-      return 'warning';
-    case 'medium':
-      return 'info';
-    case 'low':
-      return 'success';
-    default:
-      return 'default';
-  }
-};
+  // Get status color
+  const getStatusColor = (status: TicketStatus) => {
+    switch (status) {
+      case TicketStatus.OPEN:
+        return 'primary';
+      case TicketStatus.IN_PROGRESS:
+        return 'warning';
+      case TicketStatus.RESOLVED:
+        return 'success';
+      case TicketStatus.CLOSED:
+        return 'default';
+      default:
+        return 'default';
+    }
+  };
 
-const TicketDetail: React.FC<TicketDetailProps> = ({ ticket, loading, error }) => {
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
+  // Get priority icon
+  const getPriorityIcon = (priority: TicketPriority) => {
+    switch (priority) {
+      case TicketPriority.LOW:
+        return <LowIcon />;
+      case TicketPriority.MEDIUM:
+        return <MediumIcon />;
+      case TicketPriority.HIGH:
+        return <HighIcon color="warning" />;
+      case TicketPriority.CRITICAL:
+        return <CriticalIcon color="error" />;
+      default:
+        return null;
+    }
+  };
 
-  if (error) {
-    return <Alert severity="error">{error}</Alert>;
-  }
-
-  if (!ticket) {
-    return (
-      <Alert severity="warning">
-        Ticket not found
-      </Alert>
-    );
-  }
+  // Get priority color
+  const getPriorityColor = (priority: TicketPriority) => {
+    switch (priority) {
+      case TicketPriority.LOW:
+        return 'info';
+      case TicketPriority.MEDIUM:
+        return 'success';
+      case TicketPriority.HIGH:
+        return 'warning';
+      case TicketPriority.CRITICAL:
+        return 'error';
+      default:
+        return 'default';
+    }
+  };
 
   return (
-    <Card>
-      <CardContent>
-        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h5" component="h2">
-            Ticket #{ticket.id}
-          </Typography>
-          <Button
-            variant="outlined"
-            component={Link}
-            to={`/crafted/pages/ticket/${ticket.id}/edit`}
-          >
-            Edit Ticket
-          </Button>
-        </Stack>
-        
-        <Typography variant="h6" gutterBottom>
+    <Box>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+        <Typography variant="h5" component="h2" gutterBottom>
           {ticket.title}
         </Typography>
-        
-        <Grid container spacing={2} sx={{ mb: 3 }}>
-          <Grid item xs={12} sm={6} md={3}>
-            <Typography variant="body2" color="text.secondary">
-              Status
-            </Typography>
-            <Chip 
-              label={ticket.status.replace('_', ' ')} 
-              color={getStatusColor(ticket.status) as any}
-              size="small" 
-              sx={{ mt: 0.5 }}
-            />
-          </Grid>
-          
-          <Grid item xs={12} sm={6} md={3}>
-            <Typography variant="body2" color="text.secondary">
-              Priority
-            </Typography>
-            <Chip 
-              label={ticket.priority} 
-              color={getPriorityColor(ticket.priority) as any}
-              size="small" 
-              sx={{ mt: 0.5 }}
-            />
-          </Grid>
-          
-          <Grid item xs={12} sm={6} md={3}>
-            <Typography variant="body2" color="text.secondary">
-              Created At
-            </Typography>
-            <Typography variant="body1">
-              {new Date(ticket.created_at).toLocaleString()}
-            </Typography>
-          </Grid>
-          
-          <Grid item xs={12} sm={6} md={3}>
-            <Typography variant="body2" color="text.secondary">
-              Updated At
-            </Typography>
-            <Typography variant="body1">
-              {new Date(ticket.updated_at).toLocaleString()}
-            </Typography>
-          </Grid>
-        </Grid>
-        
-        <Divider sx={{ my: 3 }} />
-        
-        <Typography variant="h6" gutterBottom>
-          Description
-        </Typography>
-        <Typography variant="body1" paragraph>
-          {ticket.description}
-        </Typography>
-        
-        <Divider sx={{ my: 3 }} />
-        
-        <Grid container spacing={4}>
-          <Grid item xs={12} sm={6}>
-            <Typography variant="subtitle2" gutterBottom>
-              Created By
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Avatar sx={{ width: 32, height: 32, mr: 1 }}>
-                {ticket.created_by.charAt(0).toUpperCase()}
-              </Avatar>
-              <Typography>{ticket.created_by}</Typography>
-            </Box>
-          </Grid>
-          
-          {ticket.assigned_to && (
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" gutterBottom>
-                Assigned To
+        <Stack direction="row" spacing={1}>
+          <Button
+            variant="outlined"
+            startIcon={<EditIcon />}
+            component={Link}
+            to={`/ticket/${ticket.id}/edit`}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={<DeleteIcon />}
+            onClick={onDelete}
+          >
+            Delete
+          </Button>
+        </Stack>
+      </Box>
+
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={8}>
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Description
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Avatar sx={{ width: 32, height: 32, mr: 1 }}>
-                  {ticket.assigned_to.charAt(0).toUpperCase()}
-                </Avatar>
-                <Typography>{ticket.assigned_to}</Typography>
-              </Box>
-            </Grid>
-          )}
+              <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
+                {ticket.description}
+              </Typography>
+            </CardContent>
+          </Card>
         </Grid>
-      </CardContent>
-    </Card>
+
+        <Grid item xs={12} md={4}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Details
+              </Typography>
+              
+              <Stack spacing={2}>
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Status
+                  </Typography>
+                  <Chip 
+                    label={ticket.status}
+                    color={getStatusColor(ticket.status)}
+                    sx={{ mt: 0.5, textTransform: 'capitalize' }}
+                  />
+                </Box>
+
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Priority
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                    {getPriorityIcon(ticket.priority)}
+                    <Chip 
+                      label={ticket.priority}
+                      color={getPriorityColor(ticket.priority)}
+                      sx={{ ml: 1, textTransform: 'capitalize' }}
+                    />
+                  </Box>
+                </Box>
+                
+                <Divider />
+                
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Created by
+                  </Typography>
+                  <Typography variant="body2">
+                    User ID: {ticket.createdBy}
+                  </Typography>
+                </Box>
+                
+                {ticket.assignedTo && (
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      Assigned to
+                    </Typography>
+                    <Typography variant="body2">
+                      User ID: {ticket.assignedTo}
+                    </Typography>
+                  </Box>
+                )}
+                
+                <Divider />
+                
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Created at
+                  </Typography>
+                  <Typography variant="body2">
+                    {formatDate(ticket.createdAt)}
+                  </Typography>
+                </Box>
+                
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Updated at
+                  </Typography>
+                  <Typography variant="body2">
+                    {formatDate(ticket.updatedAt)}
+                  </Typography>
+                </Box>
+              </Stack>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 

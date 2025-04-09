@@ -4,7 +4,7 @@ import MasterLayout from '../core/layout/MasterLayout'
 import TopBarProgress from 'react-topbar-progress-indicator'
 import { getCSSVariableValue, WithChildren } from '../core/utils/helpers'
 import DashboardPageBridge from '../pages/dashboard/DashboardPage'
-import TicketsPage from '../pages/tickets/TicketsPage'
+import { TicketPage } from '../modules/ticket'
 
 const PrivateRoutes = () => {  
     return (
@@ -12,7 +12,7 @@ const PrivateRoutes = () => {
             <Route element={<MasterLayout />}> 
                 <Route path='auth/*' element={<Navigate to='/dashboard' />} /> 
                 <Route path='dashboard' element={<DashboardPageBridge />} /> 
-                <Route path='ticket/*' element={<TicketsPage />} /> 
+                <Route path='ticket/*' element={<TicketPage />} /> 
                 <Route path='*' element={<Navigate to='/error/404' />} />
             </Route>
         </Routes>
