@@ -1,16 +1,12 @@
 import { toAbsoluteUrl } from 'client/src/mui-theme/helpers'
 import { useEffect } from 'react'
-import { Outlet, Link as RouterLink } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
 
 // MUI imports
 import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import Typography from '@mui/material/Typography'
-import Container from '@mui/material/Container'
-import Stack from '@mui/material/Stack'
-import Paper from '@mui/material/Paper'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
 import { useTheme } from '@mui/material/styles'
-import Link from '@mui/material/Link'
 
 const AuthLayout = () => {
     const theme = useTheme()
@@ -28,39 +24,31 @@ const AuthLayout = () => {
     }, [])
 
     return (
-        <Grid container sx={{ height: '100%' }}>
-            {/* Content Section */}
-            <Grid item xs={12} lg={6} component={Paper} square
-                  sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                {/* Form Container */}
-                <Container maxWidth="sm" sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center',
-                    flexGrow: 1,
-                    py: 5 
-                }}>
-                    <Box sx={{ width: '100%', maxWidth: 500, p: 3 }}>
-                        <Outlet />
-                    </Box>
-                </Container>
-
-                {/* Footer */}
-                <Box sx={{ 
-                    py: 3,
-                    px: 2,
-                    display: 'flex',
-                    justifyContent: 'center',
-                    borderTop: `1px solid ${theme.palette.divider}`
-                }}>
-                    <Stack direction="row" spacing={2}>
-                        <Link href="#" underline="hover" color="primary">Terms</Link>
-                        <Link href="#" underline="hover" color="primary">Plans</Link>
-                        <Link href="#" underline="hover" color="primary">Contact Us</Link>
-                    </Stack>
-                </Box>
-            </Grid> 
-        </Grid>
+        <Box
+            sx={{
+                height: '100vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: `url(https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80)`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                position: 'relative',
+                '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    backdropFilter: 'blur(5px)',
+                    zIndex: 1
+                }
+            }}
+        >
+            <Outlet />
+        </Box>
     )
 }
 

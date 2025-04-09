@@ -14,9 +14,7 @@ const App = () => {
         <LayoutProvider>
           <ThemeModeProvider>
             <AuthInit>
-              <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-                <Outlet />
-              </Box>
+              <Outlet />
             </AuthInit>
           </ThemeModeProvider>
         </LayoutProvider>

@@ -66,7 +66,7 @@ export function Login() {
   })
 
   return (
-    <Paper elevation={3} sx={{ p: 4, maxWidth: 450, mx: 'auto' }}>
+    <Paper elevation={3} sx={{ p: 4, maxWidth: 450, mx: 'auto', zIndex: 2 }}>
       <Box
         component="form"
         onSubmit={formik.handleSubmit}
