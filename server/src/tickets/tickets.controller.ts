@@ -9,24 +9,28 @@ import {
   Delete,
   Body,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { randomDelay } from '../utils/random-delay';
-import { TicketsService } from './tickets.service';
+import { TicketsService, TicketStatus } from './tickets.service';
 
 @Controller('tickets')
 export class TicketsController {
   constructor(private ticketsService: TicketsService) {}
 
   @Get()
-  async getTickets() {
+  async getTickets(
+    @Query('status') status?: TicketStatus,
+    @Query('search') search?: string
+  ) {
     await randomDelay();
-    return this.ticketsService.tickets();
+    return this.ticketsService.tickets({ status, search });
   }
 
   @Get(':id')
   async getTicket(@Param('id') id: string) {
     await randomDelay();
-    const ticket = await this.ticketsService.ticket(Number(id));
+    const ticket = await this.ticketsService.ticket(id);
     if (ticket) return ticket;
     throw new NotFoundException();
   }
@@ -37,25 +41,39 @@ export class TicketsController {
     return this.ticketsService.newTicket(createDto);
   }
 
-  @Put(':ticketId/assign/:userId')
+  @Put(':id/status')
   @HttpCode(204)
-  async assignTicket(
-    @Param('ticketId') ticketId: string,
-    @Param('userId') userId: string
+  async updateStatus(
+    @Param('id') id: string,
+    @Body() payload: { status: TicketStatus }
   ) {
     await randomDelay();
-    const success = await this.ticketsService.assign(
-      Number(ticketId),
-      Number(userId)
+    const success = await this.ticketsService.updateStatus(
+      id,
+      payload.status
     );
     if (!success) throw new UnprocessableEntityException();
   }
 
-  @Put(':ticketId/unassign')
+  @Put(':id/assignee/:userId')
   @HttpCode(204)
-  async unassignTicket(@Param('ticketId') ticketId: string) {
+  async assignTicket(
+    @Param('id') id: string,
+    @Param('userId') userId: string
+  ) {
     await randomDelay();
-    const success = await this.ticketsService.unassign(Number(ticketId));
+    const success = await this.ticketsService.updateAssignee(
+      id,
+      userId
+    );
+    if (!success) throw new UnprocessableEntityException();
+  }
+
+  @Delete(':id/assignee')
+  @HttpCode(204)
+  async unassignTicket(@Param('id') id: string) {
+    await randomDelay();
+    const success = await this.ticketsService.updateAssignee(id, null);
     if (!success) throw new UnprocessableEntityException();
   }
 

@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@acme/shared-models';
+
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  avatar: string;
+};
 
 @Injectable()
 export class UsersService {
@@ -7,18 +13,25 @@ export class UsersService {
    * In-memory storage so data is lost on server restart.
    */
   private storedUsers: User[] = [
-    { id: 1, name: 'Alice' },
-    { id: 2, name: 'Bob' },
-    { id: 3, name: 'Chris' },
-    { id: 4, name: 'Daisy' },
-    { id: 5, name: 'Ed' },
+    { 
+      id: 'usr-001-abc',
+      name: 'John Developer', 
+      email: 'john@example.com', 
+      avatar: 'https://placehold.co/150/4287f5/ffffff?text=JD' // Màu xanh
+    },
+    { 
+      id: 'usr-002-xyz', 
+      name: 'Sarah Manager', 
+      email: 'sarah@example.com', 
+      avatar: 'https://placehold.co/150/f542a7/ffffff?text=SM' // Màu hồng
+    }
   ];
 
   async users(): Promise<User[]> {
     return this.storedUsers;
   }
 
-  async user(id: number): Promise<User | null> {
-    return this.storedUsers.find((user) => user.id === +id) ?? null;
+  async user(id: string): Promise<User | null> {
+    return this.storedUsers.find((user) => user.id === id) ?? null;
   }
 }

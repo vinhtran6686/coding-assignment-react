@@ -8,13 +8,14 @@ export class UsersController {
 
   @Get()
   async getUsers() {
+    await randomDelay();
     return this.usersService.users();
   }
 
   @Get(':id')
   async getUser(@Param('id') id: string) {
     await randomDelay();
-    const user = await this.usersService.user(Number(id));
+    const user = await this.usersService.user(id);
     if (user) return user;
     throw new NotFoundException();
   }
