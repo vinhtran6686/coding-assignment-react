@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { Ticket } from '../types';
-import { priorityColors, statusColors } from '../constants';
+import { priorityBgs, priorityColors, statusColors } from '../constants';
 import { formatDate } from '../../../utils/dateUtils';
 
 interface TicketCardProps {
@@ -22,54 +22,50 @@ interface TicketCardProps {
 }
 
 const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClick }) => {
-  // Format date to show only the date portion in a readable format
-  const formattedDate = ticket.dueDate
-    ? formatDate(ticket.dueDate)
+  // Format date to show only the date portion in a readable format 
+  const formattedDate = ticket.updatedAt
+    ? formatDate(ticket.updatedAt)
     : null;
 
   return (
     <Card
       sx={{
-        mb: 2,
-        borderLeft: `4px solid ${priorityColors[ticket.priority]}`,
+        mb: 1,
         transition: 'transform 0.2s, box-shadow 0.2s',
+        boxShadow: "none",
         '&:hover': {
-          transform: 'translateY(-2px)',
-          boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+          background: "white",
         },
       }}
     >
       <CardActionArea onClick={() => onClick(ticket.id)}>
-        <CardContent sx={{ p: 2 }}>
-          {/* Ticket ID and Status */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              fontWeight="medium"
-            >
-              {ticket.id}
-            </Typography>
-            <Chip
-              label={ticket.status}
-              size="small"
-              sx={{
-                bgcolor: statusColors[ticket.status],
-                color: 'white',
-                fontSize: '0.625rem',
-                height: '20px'
-              }}
-            />
+        <CardContent sx={{ p: '12px', borderRadius: '8px', border: '1px solid #e2e6ed' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <Tooltip title={`Priority: ${ticket.priority}`}>
+              <Chip
+                label={ticket.priority}
+                size="small"
+                sx={{
+                  bgcolor: priorityBgs[ticket.priority],
+                  color: priorityColors[ticket.priority],
+                  fontSize: '0.625rem',
+                  fontWeight: 600,
+                  height: '20px',
+                  textTransform: 'capitalize',
+                  mr: 1
+                }}
+              />
+            </Tooltip>
           </Box>
-
           {/* Ticket Title */}
           <Typography
             variant="subtitle2"
             component="h3"
             sx={{
-              mb: 1.5,
+              mb: 1.25,
               lineHeight: 1.4,
               fontWeight: 600,
+              fontSize: '16px',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               display: '-webkit-box',
@@ -79,26 +75,29 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClick }) => {
           >
             {ticket.title}
           </Typography>
+          <Typography
+            variant="body2"
+            component="div"
+            sx={{
+              mb: 1,
+              lineHeight: 1.4,
+              fontWeight: 400,
+              color: 'text.secondary',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+            }}
+          >
+            {ticket.description}
+          </Typography>
 
-          <Divider sx={{ my: 1 }} />
+          <Divider sx={{ my: 1.5 }} />
 
           {/* Footer with Priority, Due Date, and Assignee */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Tooltip title={`Priority: ${ticket.priority}`}>
-                <Chip
-                  label={ticket.priority}
-                  size="small"
-                  sx={{
-                    bgcolor: priorityColors[ticket.priority],
-                    color: 'white',
-                    fontSize: '0.625rem',
-                    height: '20px',
-                    mr: 1
-                  }}
-                />
-              </Tooltip>
-
               {formattedDate && (
                 <Tooltip title={`Due: ${formattedDate}`}>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -110,7 +109,6 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClick }) => {
                 </Tooltip>
               )}
             </Box>
-            <Typography variant="caption" color="text.secondary">{ticket.assignee}</Typography>
             {ticket.assignee && (
               <Tooltip title={`Assigned to: ${ticket.assignee}`}>
                 <Avatar
@@ -118,7 +116,7 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket, onClick }) => {
                   alt={ticket.assignee}
                   sx={{ width: 24, height: 24 }}
                 />
-                
+
               </Tooltip>
             )}
           </Box>

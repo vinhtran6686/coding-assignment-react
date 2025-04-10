@@ -4,6 +4,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { useLayout } from '../layout/core/LayoutProvider';
 import { WithChildren } from '../utils/helpers';
 import { lightTheme, darkTheme } from './themes';
+import FontLoader from './FontLoader';
 
 const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
   const { config } = useLayout();
@@ -16,7 +17,9 @@ const MuiThemeProvider: FC<WithChildren> = ({ children }) => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      {children}
+      <FontLoader>
+        {children}
+      </FontLoader>
     </ThemeProvider>
   );
 };

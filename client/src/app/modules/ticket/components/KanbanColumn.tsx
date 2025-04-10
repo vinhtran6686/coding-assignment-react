@@ -56,13 +56,11 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
         height: 'calc(100vh - 250px)',
         display: 'flex',
         flexDirection: 'column',
-        p: COLUMN_PADDING,
-        border: '1px solid',
-        borderColor: borderColor,
-        borderRadius: 1,
-        backgroundColor: 'white',
+        py: 2,
+        px: 1.25,
+        borderRadius: 2,
+        backgroundColor: '#f6f8fa',
         transition: 'all 0.2s ease',
-        borderLeft: `4px solid ${columnColor}`,
         ...(isOver && {
           boxShadow: `0 0 0 1px ${columnColor}`,
           borderStyle: 'dashed',
@@ -71,23 +69,28 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
     >
       {/* Column Header */}
       <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1
+        }}>
           <Typography
-            variant="h6"
+            variant="body1"
             fontWeight={600}
+            lineHeight={1.2}
             color={isOver ? columnColor : 'text.primary'}
           >
             {title}
           </Typography>
           <Badge
             badgeContent={tickets.length}
-            color="primary"
-            sx={{ ml: 1 }}
+            color="info"
+            sx={{
+              ml: 1,
+            }}
           />
         </Box>
       </Box>
-
-      <Divider sx={{ mb: 2 }} />
 
       {/* Tickets Container */}
       <Box
@@ -99,7 +102,9 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
           transition: 'background-color 0.2s',
           backgroundColor: isOver ? alpha(columnColor, 0.08) : 'transparent',
           borderRadius: 1,
-          p: 1,
+          '&:hover': {
+            // backgroundColor: alpha(columnColor, 0.1), // Add hover color
+          },
           '&::-webkit-scrollbar': {
             width: '6px',
           },

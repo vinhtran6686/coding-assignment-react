@@ -25,7 +25,7 @@ const darkTheme: ThemeOptions = {
     },
   },
   typography: {
-    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
+    fontFamily: '"Outfit", "Inter", "Helvetica", "Arial", sans-serif',
     h1: {
       fontWeight: 700,
     },

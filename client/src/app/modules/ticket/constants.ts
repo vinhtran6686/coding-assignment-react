@@ -1,9 +1,14 @@
 import { TicketPriority, TicketStatus as TicketStatusType } from './types';
 
 export const priorityColors: Record<TicketPriority, string> = {
-  high: '#f44336', // Red
-  medium: '#ff9800', // Orange
-  low: '#4caf50', // Green
+  high: '#ce4a30', // Red
+  medium: '#d98c5d', // Orange
+  low: '#656567', // Green
+};
+export const priorityBgs: Record<TicketPriority, string> = {
+  high: '#fff2f3', // Red
+  medium: '#fff6db', // Orange
+  low: '#f8fafb', // Green
 };
 
 export const statusColors: Record<TicketStatusType, string> = {

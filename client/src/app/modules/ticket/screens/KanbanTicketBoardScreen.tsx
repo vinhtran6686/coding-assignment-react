@@ -33,14 +33,13 @@ import TicketDetailDrawer from '../components/TicketDetailDrawer';
 
 const KanbanTicketBoardScreen: React.FC = () => {
   const { currentUser } = useAuth();
-  console.log('currentUser', currentUser);
   const { tickets, loading, error, updateTicket, addTicket } = useTickets();
 
   // UI State
   const [isAddTicketModalOpen, setIsAddTicketModalOpen] = useState(false);
   const [isAddingTicket, setIsAddingTicket] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
-  const [isDetailDrawerOpen, setIsDetailDrawerOpen] = useState(false); 
+  const [isDetailDrawerOpen, setIsDetailDrawerOpen] = useState(false);
 
   // Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -149,14 +148,14 @@ const KanbanTicketBoardScreen: React.FC = () => {
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" fontWeight={600}>Ticket Board</Typography>
+        <Typography variant="h6" fontWeight={600}>Ticket Board</Typography>
         <Button
           variant="contained"
           color="primary"
           startIcon={<AddIcon />}
           onClick={() => setIsAddTicketModalOpen(true)}
         >
-          New Ticket
+          Add New Ticket
         </Button>
       </Box>
 
@@ -171,158 +170,203 @@ const KanbanTicketBoardScreen: React.FC = () => {
         </Alert>
       )}
 
-      {/* Toolbar */}
+      {/* Content */}
       <Paper
         elevation={1}
         sx={{
-          p: 2,
           mb: 3,
           display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          alignItems: { xs: 'stretch', sm: 'center' },
+          borderRadius: 4,
+          flexDirection: 'column',
+          alignItems: 'stretch',
           gap: 2
         }}
       >
-        <TextField
-          placeholder="Search tickets..."
-          size="small"
-          fullWidth
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon fontSize="small" />
-              </InputAdornment>
-            ),
-            ...(searchQuery ? {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    size="small"
-                    onClick={() => setSearchQuery('')}
-                  >
-                    <CloseIcon fontSize="small" />
-                  </IconButton>
-                </InputAdornment>
-              )
-            } : {})
+        {/* Toolbar */}
+        <Box
+          sx={{
+            px: 2,
+            py: '20px',
+            borderBottom: '1px solid #e0e0e0',
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: { xs: 'stretch', sm: 'center' },
+            gap: 2
           }}
-          sx={{ maxWidth: { sm: 300 } }}
-        />
-
-        <Box sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 1,
-          justifyContent: 'flex-end',
-          flexGrow: 1
-        }}>
-          <Button
-            variant={showOnlyMyTickets ? "contained" : "outlined"}
+        >
+          <TextField
+            placeholder="Search tickets..."
             size="small"
-            startIcon={<PersonIcon />}
-            onClick={handleToggleMyTickets}
-          >
-            My Tasks
-          </Button>
+            sx={{
+              width: { sm: 240 },
+              flexGrow: 1,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '8px',
+                fontSize: '14px'
+              }
+            }}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" />
+                </InputAdornment>
+              ),
+              ...(searchQuery ? {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      size="small"
+                      onClick={() => setSearchQuery('')}
+                    >
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                )
+              } : {})
+            }}
+          />
 
-          <FormControl size="small" sx={{ minWidth: 120 }}>
-            <InputLabel id="status-filter-label">Status</InputLabel>
-            <Select
-              labelId="status-filter-label"
-              id="status-filter"
-              value={statusFilter}
-              label="Status"
-              onChange={handleStatusFilterChange}
-              size="small"
-            >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="open">Open</MenuItem>
-              <MenuItem value="in progress">In Progress</MenuItem>
-              <MenuItem value="testing">Testing</MenuItem>
-              <MenuItem value="completed">Completed</MenuItem>
-              <MenuItem value="backlog">Backlog</MenuItem>
-            </Select>
-          </FormControl>
-
-          <FormControl size="small" sx={{ minWidth: 120 }}>
-            <InputLabel id="priority-filter-label">Priority</InputLabel>
-            <Select
-              labelId="priority-filter-label"
-              id="priority-filter"
-              value={priorityFilter}
-              label="Priority"
-              onChange={handlePriorityFilterChange}
-              size="small"
-            >
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="high">High</MenuItem>
-              <MenuItem value="medium">Medium</MenuItem>
-              <MenuItem value="low">Low</MenuItem>
-            </Select>
-          </FormControl>
-
-          {hasActiveFilters && (
+          <Box sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 1,
+            justifyContent: 'flex-end',
+            flexGrow: 1
+          }}>
             <Button
-              variant="outlined"
+              variant={showOnlyMyTickets ? "outlined" : "text"}
               size="small"
-              color="secondary"
-              onClick={clearFilters}
+              sx={{
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: showOnlyMyTickets ? 600 : 400
+              }}
+              onClick={handleToggleMyTickets}
             >
-              Clear All
+              My Tasks
             </Button>
-          )}
+
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel id="status-filter-label" sx={{ fontSize: '14px' }}>Status</InputLabel>
+              <Select
+                labelId="status-filter-label"
+                id="status-filter"
+                value={statusFilter}
+                label="Status"
+                onChange={handleStatusFilterChange}
+                size="small"
+                sx={{
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  '.MuiOutlinedInput-notchedOutline': {
+                    borderRadius: '8px'
+                  }
+                }}
+              >
+                <MenuItem value="" sx={{ fontSize: '14px' }}>All</MenuItem>
+                <MenuItem value="open" sx={{ fontSize: '14px' }}>Open</MenuItem>
+                <MenuItem value="in progress" sx={{ fontSize: '14px' }}>In Progress</MenuItem>
+                <MenuItem value="testing" sx={{ fontSize: '14px' }}>Testing</MenuItem>
+                <MenuItem value="completed" sx={{ fontSize: '14px' }}>Completed</MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel id="priority-filter-label" sx={{ fontSize: '14px' }}>Priority</InputLabel>
+              <Select
+                labelId="priority-filter-label"
+                id="priority-filter"
+                value={priorityFilter}
+                label="Priority"
+                onChange={handlePriorityFilterChange}
+                size="small"
+                sx={{
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  '.MuiOutlinedInput-notchedOutline': {
+                    borderRadius: '8px'
+                  }
+                }}
+              >
+                <MenuItem value="" sx={{ fontSize: '14px' }}>All</MenuItem>
+                <MenuItem value="high" sx={{ fontSize: '14px' }}>High</MenuItem>
+                <MenuItem value="medium" sx={{ fontSize: '14px' }}>Medium</MenuItem>
+                <MenuItem value="low" sx={{ fontSize: '14px' }}>Low</MenuItem>
+              </Select>
+            </FormControl>
+
+            {hasActiveFilters && (
+              <Button
+                variant="outlined"
+                size="small"
+                color="secondary"
+                onClick={clearFilters}
+                sx={{
+                  borderRadius: '8px',
+                  fontSize: '14px'
+                }}
+              >
+                Clear All
+              </Button>
+            )}
+          </Box>
+        </Box>
+
+        {/* Active Filters Display */}
+        {hasActiveFilters && (
+          <Box sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 1,
+            px: 2,
+            borderBottom: '1px solid #e0e0e0'
+          }}>
+            {searchQuery && (
+              <Chip
+                label={`Search: ${searchQuery}`}
+                size="small"
+                onDelete={() => setSearchQuery('')}
+              />
+            )}
+            {statusFilter && (
+              <Chip
+                label={`Status: ${statusFilter}`}
+                size="small"
+                sx={{ bgcolor: `${statusColors[statusFilter as TicketStatus]}20`, color: statusColors[statusFilter as TicketStatus] }}
+                onDelete={() => setStatusFilter('')}
+              />
+            )}
+            {priorityFilter && (
+              <Chip
+                label={`Priority: ${priorityFilter}`}
+                size="small"
+                sx={{ bgcolor: `${priorityColors[priorityFilter as TicketPriority]}20`, color: priorityColors[priorityFilter as TicketPriority] }}
+                onDelete={() => setPriorityFilter('')}
+              />
+            )}
+            {showOnlyMyTickets && (
+              <Chip
+                label="My Tasks Only"
+                size="small"
+                onDelete={handleToggleMyTickets}
+              />
+            )}
+          </Box>
+        )}
+
+        {/* Board Content */}
+        <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
+          <KanbanBoard
+            tickets={filteredTickets}
+            isLoading={loading}
+            onTicketClick={handleTicketClick}
+            onTicketDrop={handleTicketDrop}
+            onAddNewTicket={() => setIsAddTicketModalOpen(true)}
+          />
         </Box>
       </Paper>
-
-      {/* Active Filters Display */}
-      {hasActiveFilters && (
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-          {searchQuery && (
-            <Chip
-              label={`Search: ${searchQuery}`}
-              size="small"
-              onDelete={() => setSearchQuery('')}
-            />
-          )}
-          {statusFilter && (
-            <Chip
-              label={`Status: ${statusFilter}`}
-              size="small"
-              sx={{ bgcolor: `${statusColors[statusFilter as TicketStatus]}20`, color: statusColors[statusFilter as TicketStatus] }}
-              onDelete={() => setStatusFilter('')}
-            />
-          )}
-          {priorityFilter && (
-            <Chip
-              label={`Priority: ${priorityFilter}`}
-              size="small"
-              sx={{ bgcolor: `${priorityColors[priorityFilter as TicketPriority]}20`, color: priorityColors[priorityFilter as TicketPriority] }}
-              onDelete={() => setPriorityFilter('')}
-            />
-          )}
-          {showOnlyMyTickets && (
-            <Chip
-              label="My Tasks Only"
-              size="small"
-              onDelete={handleToggleMyTickets}
-            />
-          )}
-        </Box>
-      )}
-
-      {/* Board Content */}
-      <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
-        <KanbanBoard
-          tickets={filteredTickets}
-          isLoading={loading}
-          onTicketClick={handleTicketClick}
-          onTicketDrop={handleTicketDrop}
-          onAddNewTicket={() => setIsAddTicketModalOpen(true)}
-        />
-      </Box>
-
       {/* Add Ticket Modal */}
       <Dialog
         open={isAddTicketModalOpen}

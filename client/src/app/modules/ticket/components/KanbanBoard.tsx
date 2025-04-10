@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Paper, 
+import {
+  Box,
+  Typography,
+  Paper,
   Divider,
   Skeleton,
   Stack
 } from '@mui/material';
-import { 
-  DndContext, 
-  DragEndEvent, 
-  DragOverEvent, 
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverEvent,
   DragStartEvent,
   useSensor,
   useSensors,
@@ -85,17 +85,17 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    
+
     // Reset active ticket
     setActiveTicket(null);
-    
+
     if (!over) return;
-    
+
     const ticketId = active.id as string;
     const newStatus = over.id as TicketStatus;
-    
+
     const ticket = tickets.find(t => t.id === ticketId);
-    
+
     if (ticket && ticket.status !== newStatus) {
       onTicketDrop(ticketId, newStatus);
     }
@@ -105,12 +105,12 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     return (
       <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', pb: 2 }}>
         {columns.map((column) => (
-          <Paper 
+          <Paper
             key={column.status}
-            sx={{ 
-              width: COLUMN_WIDTH, 
-              minWidth: COLUMN_WIDTH, 
-              p: COLUMN_PADDING, 
+            sx={{
+              width: COLUMN_WIDTH,
+              minWidth: COLUMN_WIDTH,
+              p: COLUMN_PADDING,
               borderRadius: 1,
               height: 'calc(100vh - 250px)'
             }}
@@ -119,14 +119,14 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
               {column.title}
             </Typography>
             <Divider sx={{ mb: 2 }} />
-            
+
             <Stack spacing={2}>
               {[1, 2, 3].map((i) => (
-                <Skeleton 
-                  key={i} 
-                  variant="rectangular" 
-                  height={120} 
-                  sx={{ borderRadius: 1 }} 
+                <Skeleton
+                  key={i}
+                  variant="rectangular"
+                  height={120}
+                  sx={{ borderRadius: 1 }}
                 />
               ))}
             </Stack>
@@ -143,13 +143,14 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          gap: 2, 
-          overflowX: 'auto', 
+      <Box
+        sx={{
+          display: 'flex',
+          gap: '12px',
+          overflowX: 'auto',
           overflowY: 'hidden',
           pb: 2,
+          px: 2,
           height: '100%',
           '&::-webkit-scrollbar': {
             height: '10px',
@@ -169,7 +170,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
             status={column.status}
             title={column.title}
             tickets={ticketsByStatus[column.status]}
-            onTicketClick={onTicketClick} 
+            onTicketClick={onTicketClick}
             activeTicket={activeTicket}
           />
         ))}

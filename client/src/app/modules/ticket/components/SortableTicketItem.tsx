@@ -11,10 +11,10 @@ interface SortableTicketItemProps {
   onClick: (ticketId: string) => void;
 }
 
-const SortableTicketItem: React.FC<SortableTicketItemProps> = ({ 
-  id, 
-  ticket, 
-  onClick 
+const SortableTicketItem: React.FC<SortableTicketItemProps> = ({
+  id,
+  ticket,
+  onClick
 }) => {
   const {
     attributes,
@@ -46,9 +46,9 @@ const SortableTicketItem: React.FC<SortableTicketItemProps> = ({
         },
       }}
     >
-      <TicketCard 
-        ticket={ticket} 
-        onClick={onClick} 
+      <TicketCard
+        ticket={ticket}
+        onClick={onClick}
       />
     </Box>
   );

@@ -46,6 +46,7 @@ const UserAvatar = styled(Avatar)(({ theme }) => ({
 
 const UserName = styled(Typography)(({ theme }) => ({
   fontWeight: 500,
+  fontSize: 14,
   color: theme.palette.text.primary,
 }));
 
