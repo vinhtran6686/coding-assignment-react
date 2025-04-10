@@ -30,15 +30,9 @@ const loginSchema = Yup.object().shape({
 })
 
 const initialValues = {
-  email: 'admin@demo.com',
-  password: 'demo',
-}
-
-/*
-  Formik+YUP+Typescript:
-  https://jaredpalmer.com/formik/docs/tutorial#getfieldprops
-  https://medium.com/@maurice.de.beijer/yup-validation-and-typescript-and-formik-6c342578a20e
-*/
+  email: 'john@example.com',
+  password: '123456',
+} 
 
 export function Login() {
   const [loading, setLoading] = useState(false)
@@ -90,7 +84,8 @@ export function Login() {
           </Alert>
         ) : (
           <Alert severity="info" sx={{ mb: 3 }}>
-            Use account <strong>admin@demo.com</strong> and password <strong>demo</strong> to
+            Use account <strong>john@example.com</strong> and password <strong>123456</strong> to
+            continue. Or <strong>sarah@example.com</strong> and password <strong>123456</strong> to
             continue.
           </Alert>
         )}

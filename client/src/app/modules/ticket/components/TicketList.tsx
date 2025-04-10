@@ -1,31 +1,44 @@
 import React from 'react';
-import { 
-  Box, 
-  Typography, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
-  Paper, 
-  IconButton,
+import { Link } from 'react-router-dom';
+import {
+  Box,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
   Chip,
+  Button,
+  IconButton,
   CircularProgress,
   Alert
 } from '@mui/material';
-import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
-import { Ticket } from '../types';
+import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Ticket, TicketStatus } from '../types';
+import { statusColors, priorityColors } from '../constants';
 
 interface TicketListProps {
   tickets: Ticket[];
   loading: boolean;
   error: string | null;
-  onDeleteTicket: (id: number) => void;
+  onDeleteTicket: (id: string) => void;
 }
 
 const TicketList: React.FC<TicketListProps> = ({ tickets, loading, error, onDeleteTicket }) => {
+  // Format date
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }).format(date);
+  };
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
@@ -35,107 +48,78 @@ const TicketList: React.FC<TicketListProps> = ({ tickets, loading, error, onDele
   }
 
   if (error) {
-    return (
-      <Alert severity="error" sx={{ my: 2 }}>
-        {error}
-      </Alert>
-    );
+    return <Alert severity="error">{error}</Alert>;
   }
 
   if (tickets.length === 0) {
     return (
-      <Alert severity="info" sx={{ my: 2 }}>
-        No tickets found. Create a new ticket to get started.
-      </Alert>
+      <Box textAlign="center" py={4}>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          No tickets found
+        </Typography>
+        <Typography variant="body2" color="text.secondary" paragraph>
+          There are no tickets to display. Create a new ticket to get started.
+        </Typography>
+      </Box>
     );
   }
 
-  // Get status color 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'open':
-        return 'primary';
-      case 'in_progress':
-        return 'warning';
-      case 'resolved':
-        return 'success';
-      case 'closed':
-        return 'default';
-      default:
-        return 'default';
-    }
-  };
-
-  // Get priority color
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'low':
-        return 'info';
-      case 'medium':
-        return 'success';
-      case 'high':
-        return 'warning';
-      case 'critical':
-        return 'error';
-      default:
-        return 'default';
-    }
-  };
-
   return (
     <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="tickets table">
+      <Table sx={{ minWidth: 650 }} aria-label="ticket table">
         <TableHead>
           <TableRow>
+            <TableCell>ID</TableCell>
             <TableCell>Title</TableCell>
             <TableCell>Status</TableCell>
             <TableCell>Priority</TableCell>
             <TableCell>Created</TableCell>
+            <TableCell>Assignee</TableCell>
             <TableCell align="right">Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {tickets.map((ticket) => (
-            <TableRow
-              key={ticket.id}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                <Link to={`/ticket/${ticket.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <Typography variant="body1" fontWeight="medium">
-                    {ticket.title}
-                  </Typography>
-                </Link>
-              </TableCell>
+            <TableRow key={ticket.id} hover>
+              <TableCell>{ticket.id.substring(0, 8)}</TableCell>
+              <TableCell>{ticket.title}</TableCell>
               <TableCell>
-                <Chip 
-                  label={ticket.status} 
-                  color={getStatusColor(ticket.status)} 
-                  size="small" 
-                  sx={{ textTransform: 'capitalize' }}
+                <Chip
+                  label={ticket.status}
+                  size="small"
+                  sx={{ 
+                    textTransform: 'capitalize',
+                    bgcolor: statusColors[ticket.status],
+                    color: 'white'
+                  }}
                 />
               </TableCell>
               <TableCell>
-                <Chip 
-                  label={ticket.priority} 
-                  color={getPriorityColor(ticket.priority)} 
-                  size="small" 
-                  sx={{ textTransform: 'capitalize' }}
+                <Chip
+                  label={ticket.priority}
+                  size="small"
+                  sx={{ 
+                    textTransform: 'capitalize',
+                    bgcolor: priorityColors[ticket.priority],
+                    color: 'white'
+                  }}
                 />
               </TableCell>
+              <TableCell>{formatDate(ticket.createdAt)}</TableCell>
               <TableCell>
-                {new Date(ticket.createdAt).toLocaleDateString()}
+                {ticket.assignee ? ticket.assignee : 'Unassigned'}
               </TableCell>
               <TableCell align="right">
                 <IconButton
                   component={Link}
                   to={`/ticket/${ticket.id}`}
                   size="small"
-                  aria-label="edit"
+                  aria-label="view"
                 >
-                  <EditIcon fontSize="small" />
+                  <VisibilityIcon fontSize="small" />
                 </IconButton>
                 <IconButton
+                  color="error"
                   size="small"
                   aria-label="delete"
                   onClick={() => onDeleteTicket(ticket.id)}

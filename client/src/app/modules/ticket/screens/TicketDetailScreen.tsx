@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -6,11 +6,6 @@ import {
   Container,
   Paper,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Breadcrumbs,
   Link as MuiLink,
   CircularProgress,
@@ -24,32 +19,23 @@ import { useTicket } from '../hooks/useTicket';
 const TicketDetailScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const ticketId = parseInt(id || '0', 10);
+  const ticketId = id || '';
   
   const { 
     ticket, 
     isLoading, 
-    error, 
-    deleteTicket, 
-    isDeleting 
+    error,
+    updateStatus
   } = useTicket(ticketId);
   
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
-  const handleDeleteClick = () => {
-    setDeleteDialogOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    const success = await deleteTicket();
-    if (success) {
-      setDeleteDialogOpen(false);
-      navigate('/ticket');
+  const handleStatusChange = async (newStatus: string) => {
+    if (ticket) {
+      await updateStatus(newStatus as any);
     }
   };
 
-  const handleDeleteCancel = () => {
-    setDeleteDialogOpen(false);
+  const handleBackToTickets = () => {
+    navigate('/ticket');
   };
 
   if (isLoading) {
@@ -69,8 +55,7 @@ const TicketDetailScreen: React.FC = () => {
           {error instanceof Error ? error.message : 'Failed to load ticket'}
         </Alert>
         <Button
-          component={Link}
-          to="/ticket"
+          onClick={handleBackToTickets}
           startIcon={<ArrowBackIcon />}
           sx={{ mt: 2 }}
         >
@@ -87,8 +72,7 @@ const TicketDetailScreen: React.FC = () => {
           Ticket not found
         </Alert>
         <Button
-          component={Link}
-          to="/ticket"
+          onClick={handleBackToTickets}
           startIcon={<ArrowBackIcon />}
           sx={{ mt: 2 }}
         >
@@ -101,7 +85,15 @@ const TicketDetailScreen: React.FC = () => {
   return (
     <Container maxWidth="lg">
       {/* Title Section */}
-      <Box sx={{ mb: 3 }}>
+      <Box sx={{ mb: 3, mt: 3 }}>
+        <Button
+          onClick={handleBackToTickets}
+          startIcon={<ArrowBackIcon />}
+          sx={{ mb: 2 }}
+        >
+          Back to Tickets
+        </Button>
+        
         <Typography variant="h4" component="h1" gutterBottom>
           Ticket Details
         </Typography>
@@ -109,10 +101,10 @@ const TicketDetailScreen: React.FC = () => {
           <MuiLink component={Link} to="/dashboard" underline="hover" color="inherit">
             Dashboard
           </MuiLink>
-          <MuiLink component={Link} to="/ticket" underline="hover" color="inherit">
+          <MuiLink component={Link} to="/ticket" color="inherit">
             Tickets
           </MuiLink>
-          <Typography color="text.primary">Ticket #{ticket.id}</Typography>
+          <Typography color="text.primary">Ticket #{ticket.id.substring(0, 8)}</Typography>
         </Breadcrumbs>
       </Box>
       
@@ -120,37 +112,9 @@ const TicketDetailScreen: React.FC = () => {
       <Paper sx={{ p: 3, mb: 4, borderRadius: 2, boxShadow: (theme) => theme.shadows[2] }}>
         <TicketDetail 
           ticket={ticket} 
-          onDelete={handleDeleteClick}
+          onStatusChange={handleStatusChange}
         />
       </Paper>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={handleDeleteCancel}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          Confirm Delete
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this ticket? This action cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteCancel}>Cancel</Button>
-          <Button 
-            onClick={handleDeleteConfirm} 
-            color="error" 
-            autoFocus
-            disabled={isDeleting}
-          >
-            {isDeleting ? 'Deleting...' : 'Delete'}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Container>
   );
 };

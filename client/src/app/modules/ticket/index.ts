@@ -1,8 +1,7 @@
 // Export main components
 export { default as TicketPage } from './TicketPage';
 
-// Export screens
-export { default as TicketListScreen } from './screens/TicketListScreen';
+// Export screens 
 export { default as TicketDetailScreen } from './screens/TicketDetailScreen';
 
 // Export hooks
@@ -13,8 +12,7 @@ export { useTicket } from './hooks/useTicket';
 export type { Ticket } from './types';
 
 // Re-export components
-export { default as TicketList } from './components/TicketList';
-export { default as TicketForm } from './components/TicketForm';
+export { default as TicketList } from './components/TicketList'; 
 export { default as TicketCard } from './components/TicketCard';
 
 // Services

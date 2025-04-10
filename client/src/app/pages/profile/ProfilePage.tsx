@@ -8,18 +8,16 @@ const ProfilePage: FC = () => {
 
   // Mock user data (would come from authentication context in a real app)
   const user = currentUser || {
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    username: 'johndoe',
-    role: 'Administrator',
+    name: 'John Doe',
+    email: 'john@example.com',
+    avatar: 'https://placehold.co/150/4287f5/ffffff?text=JD',
   };
 
   return (
     <>
-      this is profile page
+      <p>This is profile page</p>
       {
-        currentUser?.username && JSON.stringify(currentUser)
+        currentUser && JSON.stringify(currentUser)
       }
     </>
   );

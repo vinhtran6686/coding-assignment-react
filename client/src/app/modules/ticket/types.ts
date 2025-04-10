@@ -2,36 +2,29 @@
  * Ticket interface - represents a ticket entity
  */
 export interface Ticket {
-  id: number;
+  id: string;
+  key?: string;
   title: string;
   description: string;
   status: TicketStatus;
   priority: TicketPriority;
+  assignee?: string;
+  assigneeId?: string;
+  assigneeAvatar?: string;
+  dueDate?: string;
   createdAt: string;
   updatedAt: string;
-  assignedTo?: number;
-  createdBy: number;
 }
 
 /**
  * Ticket status enum
  */
-export enum TicketStatus {
-  OPEN = 'open',
-  IN_PROGRESS = 'in_progress',
-  RESOLVED = 'resolved',
-  CLOSED = 'closed'
-}
+export type TicketStatus = 'open' | 'in progress' | 'testing' | 'completed';
 
 /**
  * Ticket priority enum
  */
-export enum TicketPriority {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  CRITICAL = 'critical'
-}
+export type TicketPriority = 'high' | 'medium' | 'low';
 
 /**
  * Ticket filter options
@@ -40,7 +33,7 @@ export interface TicketFilters {
   status?: TicketStatus;
   priority?: TicketPriority;
   searchQuery?: string;
-  assignedTo?: number;
+  assignedTo?: string;
 }
 
 /**
@@ -49,8 +42,7 @@ export interface TicketFilters {
 export interface CreateTicketRequest {
   title: string;
   description: string;
-  priority: TicketPriority;
-  assignedTo?: number;
+  assigneeId: string;
 }
 
 /**
@@ -61,5 +53,23 @@ export interface UpdateTicketRequest {
   description?: string;
   status?: TicketStatus;
   priority?: TicketPriority;
-  assignedTo?: number;
+  assignedTo?: string;
+}
+
+/**
+ * Update ticket status request
+ */
+export interface UpdateTicketStatusRequest {
+  status: TicketStatus;
+}
+
+export interface TicketColumn {
+  id: TicketStatus;
+  title: string;
+  tickets: Ticket[];
+}
+
+export interface DragEndEvent {
+  active: { id: string };
+  over?: { id: string | null };
 } 

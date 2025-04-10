@@ -68,11 +68,11 @@ const Header: FC = () => {
   };
   
   const fullName = currentUser 
-    ? `${currentUser.first_name} ${currentUser.last_name}` 
+    ? `${currentUser.name}` 
     : 'User';
 
-  // Generate avatar URL using placehold.co
-  const avatarUrl = "https://placehold.co/36x36/3699FF/FFFFFF?text=U";
+  // Generate avatar URL using currentUser avatar if available
+  const avatarUrl = currentUser?.avatar || "https://placehold.co/36x36/3699FF/FFFFFF?text=U";
 
   return (
     <HeaderRoot>

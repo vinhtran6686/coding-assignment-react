@@ -14,7 +14,7 @@ export class AuthController {
     return user;
   }
 
-  @Post('verify_token')
+  @Post('verify-token')
   async verifyToken(@Body() body: { api_token: string }) {
     const user = await this.authService.verifyToken(body.api_token);
     if (!user) {

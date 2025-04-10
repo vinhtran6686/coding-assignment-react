@@ -1,14 +1,15 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import TicketListScreen from './screens/TicketListScreen';
 import TicketDetailScreen from './screens/TicketDetailScreen';
+import KanbanTicketBoardScreen from './screens/KanbanTicketBoardScreen';
 
 const TicketPage: React.FC = () => {
     return (
         <Routes>
-            <Route path="/" element={<Navigate to="list" replace />} />
-            <Route path="list" element={<TicketListScreen />} />
+            <Route path="/" element={<KanbanTicketBoardScreen />} />
             <Route path=":id" element={<TicketDetailScreen />} />
+            {/* Redirect old kanban route to main route for backward compatibility */}
+            <Route path="kanban" element={<Navigate to="/ticket" replace />} />
         </Routes>
     );
 };
