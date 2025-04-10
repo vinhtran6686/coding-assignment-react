@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import * as Yup from 'yup'
 import { Link } from 'react-router-dom'
-import { useFormik } from 'formik'
+import { useForm } from 'react-hook-form'
 import { getUserByToken, login } from '../core/_requests'
 import { useAuth } from '../core/Auth' 
 
@@ -17,52 +16,46 @@ import Paper from '@mui/material/Paper'
 import CircularProgress from '@mui/material/CircularProgress'
 import Stack from '@mui/material/Stack'
 
-const loginSchema = Yup.object().shape({
-  email: Yup.string()
-    .email('Wrong email format')
-    .min(3, 'Minimum 3 symbols')
-    .max(50, 'Maximum 50 symbols')
-    .required('Email is required'),
-  password: Yup.string()
-    .min(3, 'Minimum 3 symbols')
-    .max(50, 'Maximum 50 symbols')
-    .required('Password is required'),
-})
+type LoginFormValues = {
+  email: string;
+  password: string;
+}
 
-const initialValues = {
+const defaultValues = {
   email: 'john@example.com',
   password: '123456',
 } 
 
 export function Login() {
   const [loading, setLoading] = useState(false)
+  const [status, setStatus] = useState<string | null>(null)
   const { saveAuth, setCurrentUser } = useAuth()
 
-  const formik = useFormik({
-    initialValues,
-    validationSchema: loginSchema,
-    onSubmit: async (values, { setStatus, setSubmitting }) => {
-      setLoading(true)
-      try {
-        const { data: auth } = await login(values.email, values.password)
-        saveAuth(auth)
-        const { data: user } = await getUserByToken(auth.api_token)
-        setCurrentUser(user)
-      } catch (error) {
-        console.error(error)
-        saveAuth(undefined)
-        setStatus('The login details are incorrect')
-        setSubmitting(false)
-        setLoading(false)
-      }
-    },
+  const { register, handleSubmit, formState: { errors, isSubmitting, isValid } } = useForm<LoginFormValues>({
+    defaultValues,
+    mode: 'onChange'
   })
+
+  const onSubmit = async (values: LoginFormValues) => {
+    setLoading(true)
+    try {
+      const { data: auth } = await login(values.email, values.password)
+      saveAuth(auth)
+      const { data: user } = await getUserByToken(auth.api_token)
+      setCurrentUser(user)
+    } catch (error) {
+      console.error(error)
+      saveAuth(undefined)
+      setStatus('The login details are incorrect')
+      setLoading(false)
+    }
+  }
 
   return (
     <Paper elevation={3} sx={{ p: 4, maxWidth: 450, mx: 'auto', zIndex: 2 }}>
       <Box
         component="form"
-        onSubmit={formik.handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         noValidate
         id='kt_login_signin_form'
         sx={{ width: '100%' }}
@@ -78,9 +71,9 @@ export function Login() {
         </Box>
 
         {/* Status Messages */}
-        {formik.status ? (
+        {status ? (
           <Alert severity="error" sx={{ mb: 3 }}>
-            {formik.status}
+            {status}
           </Alert>
         ) : (
           <Alert severity="info" sx={{ mb: 3 }}>
@@ -95,16 +88,27 @@ export function Login() {
           <TextField
             fullWidth
             id="email"
-            name="email"
             label="Email"
             variant="outlined"
             placeholder="Email"
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.email && Boolean(formik.errors.email)}
-            helperText={formik.touched.email && formik.errors.email}
+            error={!!errors.email}
+            helperText={errors.email?.message}
             InputLabelProps={{ shrink: true }}
+            {...register('email', {
+              required: 'Email is required',
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: 'Wrong email format'
+              },
+              minLength: {
+                value: 3,
+                message: 'Minimum 3 symbols'
+              },
+              maxLength: {
+                value: 50,
+                message: 'Maximum 50 symbols'
+              }
+            })}
           />
         </Box>
 
@@ -113,25 +117,25 @@ export function Login() {
           <TextField
             fullWidth
             id="password"
-            name="password"
             type="password"
             label="Password"
             variant="outlined"
             placeholder="Password"
-            value={formik.values.password}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.password && Boolean(formik.errors.password)}
-            helperText={formik.touched.password && formik.errors.password}
+            error={!!errors.password}
+            helperText={errors.password?.message}
             InputLabelProps={{ shrink: true }}
+            {...register('password', {
+              required: 'Password is required',
+              minLength: {
+                value: 3,
+                message: 'Minimum 3 symbols'
+              },
+              maxLength: {
+                value: 50,
+                message: 'Maximum 50 symbols'
+              }
+            })}
           />
-        </Box>
-
-        {/* Forgot Password Link */}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
-          <Link to='/auth/forgot-password' style={{ textDecoration: 'none' }}>
-            <Typography color="primary">Forgot Password?</Typography>
-          </Link>
         </Box>
 
         {/* Submit Button */}
@@ -143,7 +147,7 @@ export function Login() {
             color="primary"
             size="large"
             id="kt_sign_in_submit"
-            disabled={formik.isSubmitting || !formik.isValid}
+            disabled={isSubmitting || !isValid}
             sx={{ py: 1.5 }}
           >
             {!loading ? (
@@ -155,18 +159,6 @@ export function Login() {
               </Stack>
             )}
           </Button>
-        </Box>
-
-        {/* Sign Up Link */}
-        <Box sx={{ textAlign: 'center' }}>
-          <Typography variant="body2" color="text.secondary">
-            Not a Member yet?{' '}
-            <Link to='/auth/registration' style={{ textDecoration: 'none' }}>
-              <Typography component="span" color="primary">
-                Sign up
-              </Typography>
-            </Link>
-          </Typography>
         </Box>
       </Box>
     </Paper>

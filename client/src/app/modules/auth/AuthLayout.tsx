@@ -1,6 +1,6 @@
 import { toAbsoluteUrl } from 'client/src/app/core/utils/helpers'
 import { useEffect } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet } from 'react-router-dom' 
 
 // MUI imports
 import Box from '@mui/material/Box'
@@ -12,8 +12,7 @@ const AuthLayout = () => {
                 height: '100vh',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                background: `url(https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80)`,
+                justifyContent: 'center', 
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 position: 'relative',
