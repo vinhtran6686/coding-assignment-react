@@ -1,11 +1,11 @@
-import { TicketPriority, TicketStatus as TicketStatusType } from './types';
+import { TicketPriority as TicketPriorityType, TicketStatus as TicketStatusType } from './types';
 
-export const priorityColors: Record<TicketPriority, string> = {
+export const priorityColors: Record<TicketPriorityType, string> = {
   high: '#ce4a30', // Red
   medium: '#d98c5d', // Orange
   low: '#656567', // Green
 };
-export const priorityBgs: Record<TicketPriority, string> = {
+export const priorityBgs: Record<TicketPriorityType, string> = {
   high: '#fff2f3', // Red
   medium: '#fff6db', // Orange
   low: '#f8fafb', // Green
@@ -30,3 +30,9 @@ export const TicketStatus = {
   COMPLETED: 'completed' as TicketStatusType,
   // BACKLOG: 'backlog' as TicketStatusType
 }; 
+
+export const TicketPriority = {
+  HIGH: 'high' as TicketPriorityType,
+  MEDIUM: 'medium' as TicketPriorityType,
+  LOW: 'low' as TicketPriorityType,
+}

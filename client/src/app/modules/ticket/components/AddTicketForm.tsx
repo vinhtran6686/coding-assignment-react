@@ -58,8 +58,7 @@ const AddTicketForm: React.FC<AddTicketFormProps> = ({
     const { name, value } = e.target;
     if (name) {
       setFormData(prev => ({ ...prev, [name]: value }));
-      
-      // Clear error when field is modified
+       
       if (errors[name]) {
         setErrors(prev => {
           const updated = { ...prev };
@@ -76,8 +75,7 @@ const AddTicketForm: React.FC<AddTicketFormProps> = ({
     const { name, value } = e.target;
     if (name) {
       setFormData(prev => ({ ...prev, [name]: value }));
-      
-      // Clear error when field is modified
+       
       if (errors[name]) {
         setErrors(prev => {
           const updated = { ...prev };
@@ -115,8 +113,7 @@ const AddTicketForm: React.FC<AddTicketFormProps> = ({
     }
 
     const result = await onSubmit(formData);
-    if (result) {
-      // Form submitted successfully, no need to do anything as parent will handle closing
+    if (result) { 
     }
   };
 

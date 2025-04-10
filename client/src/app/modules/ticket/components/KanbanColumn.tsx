@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -6,7 +6,9 @@ import {
   Divider,
   Badge,
   Button,
-  alpha
+  alpha,
+  Skeleton,
+  CircularProgress
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useDroppable } from '@dnd-kit/core';
@@ -22,7 +24,9 @@ interface KanbanColumnProps {
   title: string;
   tickets: Ticket[];
   onTicketClick: (ticketId: string) => void;
+  onTicketEdit?: (ticketId: string) => void;
   activeTicket: Ticket | null;
+  pendingUpdate?: { ticketId: string, newStatus: TicketStatus } | null;
 }
 
 const KanbanColumn: React.FC<KanbanColumnProps> = ({
@@ -30,22 +34,32 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   title,
   tickets,
   onTicketClick,
-  activeTicket
+  onTicketEdit,
+  activeTicket,
+  pendingUpdate = null
 }) => {
   const { setNodeRef, isOver } = useDroppable({
     id: status,
   });
 
+  // Determine if this column is receiving a new ticket
+  const isReceivingTicket = pendingUpdate && pendingUpdate.newStatus === status;
+  const isLosingTicket = pendingUpdate &&
+    tickets.some(t => t.id === pendingUpdate.ticketId) &&
+    pendingUpdate.newStatus !== status;
+
   // Determine if we should highlight this column
   const highlightColumn = isOver ||
     (activeTicket !== null && activeTicket.status === status);
-
 
   // Derive styles based on status and drag state
   const columnColor = statusColors[status];
   const borderColor = isOver
     ? columnColor
     : 'divider';
+
+  // Memoize ticket IDs to prevent unnecessary re-renders
+  const ticketIds = useMemo(() => tickets.map(t => t.id), [tickets]);
 
   return (
     <Paper
@@ -62,8 +76,12 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
         backgroundColor: '#f6f8fa',
         transition: 'all 0.2s ease',
         ...(isOver && {
-          boxShadow: `0 0 0 1px ${columnColor}`,
+          boxShadow: `0 0 0 2px ${columnColor}`,
           borderStyle: 'dashed',
+        }),
+        ...(isReceivingTicket && {
+          boxShadow: `0 0 0 1px ${columnColor}`,
+          backgroundColor: alpha(columnColor, 0.04),
         }),
       }}
     >
@@ -89,6 +107,9 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
               ml: 1,
             }}
           />
+          {isReceivingTicket && (
+            <CircularProgress size={16} thickness={6} sx={{ ml: 1, color: columnColor }} />
+          )}
         </Box>
       </Box>
 
@@ -102,9 +123,6 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
           transition: 'background-color 0.2s',
           backgroundColor: isOver ? alpha(columnColor, 0.08) : 'transparent',
           borderRadius: 1,
-          '&:hover': {
-            // backgroundColor: alpha(columnColor, 0.1), // Add hover color
-          },
           '&::-webkit-scrollbar': {
             width: '6px',
           },
@@ -116,11 +134,13 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
             backgroundColor: 'rgba(0, 0, 0, 0.05)',
           },
           // Add momentum scrolling on touch devices
-          WebkitOverflowScrolling: 'touch'
+          WebkitOverflowScrolling: 'touch',
+          // Min height to prevent layout jumping when empty
+          minHeight: 100
         }}
       >
         <SortableContext
-          items={tickets.map(t => t.id)}
+          items={ticketIds}
           strategy={verticalListSortingStrategy}
         >
           {tickets.length > 0 ? (
@@ -129,13 +149,16 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                 key={ticket.id}
                 id={ticket.id}
                 ticket={ticket}
-                onClick={onTicketClick}
+                onClick={() => onTicketClick(ticket.id)}
+                onEdit={onTicketEdit ? (id) => onTicketEdit(id) : undefined}
+                isPending={pendingUpdate?.ticketId === ticket.id}
               />
             ))
           ) : (
             <Box
               sx={{
                 height: '100%',
+                minHeight: 120,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -145,6 +168,11 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
                 border: '1px dashed',
                 borderColor: 'divider',
                 fontSize: '0.875rem',
+                transition: 'all 0.2s ease',
+                ...(isOver && {
+                  borderColor: columnColor,
+                  backgroundColor: alpha(columnColor, 0.04),
+                }),
               }}
             >
               <Typography variant="body2">No tickets</Typography>

@@ -12,7 +12,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { randomDelay } from '../utils/random-delay';
-import { TicketsService, TicketStatus, CreateTicketDto } from './tickets.service';
+import { TicketsService, TicketStatus, CreateTicketDto, UpdateTicketDto } from './tickets.service';
 
 @Controller('tickets')
 export class TicketsController {
@@ -39,6 +39,17 @@ export class TicketsController {
   async createTicket(@Body() createDto: CreateTicketDto) {
     await randomDelay();
     return this.ticketsService.createTicket(createDto);
+  }
+
+  @Put(':id')
+  async updateTicket(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateTicketDto
+  ) {
+    await randomDelay();
+    const updatedTicket = await this.ticketsService.updateTicket(id, updateDto);
+    if (!updatedTicket) throw new NotFoundException();
+    return updatedTicket;
   }
 
   @Put(':id/status')

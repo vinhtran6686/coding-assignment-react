@@ -37,6 +37,13 @@ export type CreateTicketDto = {
   assigneeId?: string;
 };
 
+export type UpdateTicketDto = {
+  title?: string;
+  description?: string;
+  status?: TicketStatus;
+  priority?: TicketPriority;
+};
+
 @Injectable()
 export class TicketsService {
   private storedTickets: Ticket[] = [
@@ -187,6 +194,35 @@ export class TicketsService {
     
     if (createDto.assigneeId) {
       const assigneeUser = await this.usersService.user(createDto.assigneeId);
+      if (assigneeUser) {
+        enhancedTicket.assignee = assigneeUser.name;
+        enhancedTicket.assigneeAvatar = assigneeUser.avatar;
+      }
+    }
+    
+    return enhancedTicket;
+  }
+
+  async updateTicket(ticketId: string, updateDto: UpdateTicketDto): Promise<TicketResponse | null> {
+    const ticketIndex = this.storedTickets.findIndex((t) => t.id === ticketId);
+    
+    if (ticketIndex === -1) return null;
+    
+    // Update ticket fields
+    const ticket = this.storedTickets[ticketIndex];
+    const updatedTicket: Ticket = {
+      ...ticket,
+      ...updateDto,
+      updatedAt: new Date().toISOString()
+    };
+    
+    this.storedTickets[ticketIndex] = updatedTicket;
+    
+    // Return enhanced ticket with assignee info
+    const enhancedTicket: TicketResponse = { ...updatedTicket };
+    
+    if (updatedTicket.assigneeId) {
+      const assigneeUser = await this.usersService.user(updatedTicket.assigneeId);
       if (assigneeUser) {
         enhancedTicket.assignee = assigneeUser.name;
         enhancedTicket.assigneeAvatar = assigneeUser.avatar;

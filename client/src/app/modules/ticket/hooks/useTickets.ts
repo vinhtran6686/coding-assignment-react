@@ -58,11 +58,23 @@ export const useTickets = () => {
 
   const updateTicket = useCallback(async (updatedTicket: Ticket) => {
     try {
-      // Only update status currently, based on API docs
-      await api.put(`/tickets/${updatedTicket.id}/status`, {
-        id: updatedTicket.id,
-        status: updatedTicket.status.charAt(0).toUpperCase() + updatedTicket.status.slice(1)
-      });
+      // Check if we're only updating status
+      if (updatedTicket.status && Object.keys(updatedTicket).length <= 3) {
+        // Status-only update endpoint
+        await api.put(`/tickets/${updatedTicket.id}/status`, {
+          status: updatedTicket.status
+        });
+      } else {
+        // Full ticket update endpoint - new implementation
+        const updateData = {
+          title: updatedTicket.title,
+          description: updatedTicket.description,
+          status: updatedTicket.status,
+          priority: updatedTicket.priority
+        };
+        
+        await api.put(`/tickets/${updatedTicket.id}`, updateData);
+      }
       
       // Update local state
       setTickets(prevTickets => 
@@ -71,11 +83,11 @@ export const useTickets = () => {
         )
       );
       
-      return true;
+      return { success: true, data: updatedTicket };
     } catch (err) {
       console.error('Error updating ticket:', err);
       setError('Failed to update ticket. Please try again later.');
-      return false;
+      return { success: false, error: err };
     }
   }, []);
 

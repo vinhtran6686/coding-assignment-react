@@ -40,6 +40,7 @@ const KanbanTicketBoardScreen: React.FC = () => {
   const [isAddingTicket, setIsAddingTicket] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [isDetailDrawerOpen, setIsDetailDrawerOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   // Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -49,6 +50,7 @@ const KanbanTicketBoardScreen: React.FC = () => {
 
   // Error handling
   const [operationError, setOperationError] = useState<string | null>(null);
+  const [operationSuccess, setOperationSuccess] = useState<string | null>(null);
 
   // Filter tickets based on all criteria
   const filteredTickets = tickets.filter(ticket => {
@@ -64,27 +66,77 @@ const KanbanTicketBoardScreen: React.FC = () => {
     return matchesSearch && matchesStatus && matchesPriority && matchesAssignee;
   });
 
-  // Clear error after 5 seconds
+  // Clear messages after 5 seconds
   useEffect(() => {
-    let timer: NodeJS.Timeout | undefined;
+    let errorTimer: NodeJS.Timeout | undefined;
+    let successTimer: NodeJS.Timeout | undefined;
+    
     if (operationError) {
-      timer = setTimeout(() => {
+      errorTimer = setTimeout(() => {
         setOperationError(null);
       }, 5000);
     }
+    
+    if (operationSuccess) {
+      successTimer = setTimeout(() => {
+        setOperationSuccess(null);
+      }, 5000);
+    }
+    
     // Return cleanup function
     return () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
+      if (errorTimer) clearTimeout(errorTimer);
+      if (successTimer) clearTimeout(successTimer);
     };
-  }, [operationError]);
+  }, [operationError, operationSuccess]);
 
-  const handleTicketClick = (ticketId: string) => {
+  const handleTicketClick = (ticketId: string) => { 
+    const ticket = tickets.find(t => t.id === ticketId); 
+    if (ticket) {
+      setSelectedTicket(ticket);
+      setIsDetailDrawerOpen(true);
+      setIsEditMode(false);
+    }
+  };
+
+  const handleTicketEdit = (ticketId: string) => {
     const ticket = tickets.find(t => t.id === ticketId);
     if (ticket) {
       setSelectedTicket(ticket);
       setIsDetailDrawerOpen(true);
+      setIsEditMode(true);
+    }
+  };
+
+  const handleTicketUpdate = async (
+    ticketId: string, 
+    data: { title: string; description: string; status: TicketStatus; priority: TicketPriority }
+  ) => {
+    try {
+      const ticket = tickets.find(t => t.id === ticketId);
+      if (!ticket) return false;
+
+      const updatedTicket = {
+        ...ticket,
+        ...data
+      };
+
+      const result = await updateTicket(updatedTicket);
+      
+      if (result.success) {
+        // Show success feedback
+        setOperationSuccess('Ticket updated successfully');
+        // Auto-close drawer on success
+        setTimeout(() => setIsDetailDrawerOpen(false), 1000);
+        return true;
+      } else {
+        setOperationError('Failed to update ticket: ' + (result.error?.toString() || 'Unknown error'));
+        return false;
+      }
+    } catch (error) {
+      setOperationError('Failed to update ticket. Please try again.');
+      console.error('Error updating ticket:', error);
+      return false;
     }
   };
 
@@ -110,6 +162,7 @@ const KanbanTicketBoardScreen: React.FC = () => {
       const result = await addTicket(ticketData);
       if (result.success) {
         setIsAddTicketModalOpen(false);
+        setOperationSuccess('Ticket added successfully');
         return true;
       }
       setOperationError('Failed to add ticket. Please try again.');
@@ -170,6 +223,17 @@ const KanbanTicketBoardScreen: React.FC = () => {
         </Alert>
       )}
 
+      {/* Success Alert */}
+      {operationSuccess && (
+        <Alert
+          severity="success"
+          sx={{ mb: 2 }}
+          onClose={() => setOperationSuccess(null)}
+        >
+          {operationSuccess}
+        </Alert>
+      )}
+
       {/* Content */}
       <Paper
         elevation={1}
@@ -178,20 +242,19 @@ const KanbanTicketBoardScreen: React.FC = () => {
           display: 'flex',
           borderRadius: 4,
           flexDirection: 'column',
-          alignItems: 'stretch',
-          gap: 2
+          alignItems: 'stretch', 
         }}
       >
         {/* Toolbar */}
         <Box
           sx={{
             px: 2,
-            py: '20px',
+            py: 2.5,
             borderBottom: '1px solid #e0e0e0',
             display: 'flex',
             flexDirection: { xs: 'column', sm: 'row' },
             alignItems: { xs: 'stretch', sm: 'center' },
-            gap: 2
+            gap: 2, 
           }}
         >
           <TextField
@@ -320,7 +383,7 @@ const KanbanTicketBoardScreen: React.FC = () => {
             display: 'flex',
             flexWrap: 'wrap',
             gap: 1,
-            px: 2,
+            p: 2,
             borderBottom: '1px solid #e0e0e0'
           }}>
             {searchQuery && (
@@ -357,11 +420,12 @@ const KanbanTicketBoardScreen: React.FC = () => {
         )}
 
         {/* Board Content */}
-        <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
+        <Box sx={{ flexGrow: 1, overflow: 'hidden', pt: 2 }}>
           <KanbanBoard
             tickets={filteredTickets}
             isLoading={loading}
             onTicketClick={handleTicketClick}
+            onTicketEdit={handleTicketEdit}
             onTicketDrop={handleTicketDrop}
             onAddNewTicket={() => setIsAddTicketModalOpen(true)}
           />
@@ -400,6 +464,8 @@ const KanbanTicketBoardScreen: React.FC = () => {
         open={isDetailDrawerOpen}
         ticket={selectedTicket}
         onClose={() => setIsDetailDrawerOpen(false)}
+        isEditMode={isEditMode}
+        onSave={handleTicketUpdate}
       />
     </Box>
   );

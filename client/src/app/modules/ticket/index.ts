@@ -11,8 +11,7 @@ export { useTicket } from './hooks/useTicket';
 // Export types
 export type { Ticket } from './types';
 
-// Re-export components
-export { default as TicketList } from './components/TicketList'; 
+// Re-export components 
 export { default as TicketCard } from './components/TicketCard';
 
 // Services
