@@ -6,7 +6,6 @@ import { useAuth } from '../modules/auth/core/Auth';
 import App from '../app';
 import { AuthPage } from '../modules/auth/AuthPage';
 import { Logout } from '../modules/auth/Logout';
-import { ErrorsPage } from '../modules/errors/ErrorsPage';
 import { PrivateRoutes } from './PrivateRoutes';
 
 const AppRoutes: FC = () => {
@@ -16,7 +15,6 @@ const AppRoutes: FC = () => {
     <BrowserRouter>
       <Routes>
         <Route element={<App />}>
-          <Route path='error/*' element={<ErrorsPage />} />
           <Route path='logout' element={<Logout />} />
           {currentUser ? (
             <>

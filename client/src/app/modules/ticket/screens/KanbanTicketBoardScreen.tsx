@@ -15,14 +15,12 @@ import {
   DialogContent,
   IconButton,
   Chip,
-  Stack,
   Alert,
   SelectChangeEvent
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import PersonIcon from '@mui/icons-material/Person';
 import AddIcon from '@mui/icons-material/Add';
-import TuneIcon from '@mui/icons-material/Tune';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { useTickets } from '../hooks/useTickets';
@@ -42,8 +40,7 @@ const KanbanTicketBoardScreen: React.FC = () => {
   const [isAddTicketModalOpen, setIsAddTicketModalOpen] = useState(false);
   const [isAddingTicket, setIsAddingTicket] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
-  const [isDetailDrawerOpen, setIsDetailDrawerOpen] = useState(false);
-  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [isDetailDrawerOpen, setIsDetailDrawerOpen] = useState(false); 
 
   // Filter State
   const [searchQuery, setSearchQuery] = useState('');

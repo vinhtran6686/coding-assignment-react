@@ -6,14 +6,13 @@ import { getCSSVariableValue, WithChildren } from '../core/utils/helpers'
 import DashboardPageBridge from '../pages/dashboard/DashboardPage'
 import { TicketPage } from '../modules/ticket'
 
-const PrivateRoutes = () => {  
+const PrivateRoutes = () => {
     return (
         <Routes>
-            <Route element={<MasterLayout />}> 
-                <Route path='auth/*' element={<Navigate to='/dashboard' />} /> 
-                <Route path='dashboard' element={<DashboardPageBridge />} /> 
-                <Route path='ticket/*' element={<TicketPage />} /> 
-                <Route path='*' element={<Navigate to='/error/404' />} />
+            <Route element={<MasterLayout />}>
+                <Route path='auth/*' element={<Navigate to='/dashboard' />} />
+                <Route path='dashboard' element={<DashboardPageBridge />} />
+                <Route path='ticket/*' element={<TicketPage />} />
             </Route>
         </Routes>
     )
